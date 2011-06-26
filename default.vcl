@@ -1,17 +1,13 @@
-# This is a basic VCL configuration file for varnish.  See the vcl(7)
-# man page for details on VCL syntax and semantics.
-# 
 # Default backend definition.  Set this to point to your content
 # server.
- 
 backend default {
-	.host = "127.0.0.1";
+	# I have Virtual Hosts that only listen to the Public IP
+	# so no 127.0.0.1 for me
+	.host = "193.239.210.183";
      	.port = "80";
 }
- 
-# Below is a commented-out copy of the default VCL logic.  If you
-# redefine any of these subroutines, the built-in logic will be
-# appended to your code.
+
+# Handle the HTTP request received by the client 
 sub vcl_recv {
 	if (req.restarts == 0) {
  		if (req.http.x-forwarded-for) {
@@ -21,6 +17,11 @@ sub vcl_recv {
 	 	}
      	}
 
+	# Normalize the header, remove the port (in case you're testing this on various TCP ports)
+	set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
+	# And remove the "www."-prefix (all my sites serve the same content, regardless of www.
+	set req.http.Host = regsub(req.http.Host, "^www\.", "");
+
      	if (req.request != "GET" &&
        		req.request != "HEAD" &&
       	 	req.request != "PUT" &&
@@ -28,17 +29,24 @@ sub vcl_recv {
        		req.request != "TRACE" &&
        		req.request != "OPTIONS" &&
       	 	req.request != "DELETE") {
-         	/* Non-RFC2616 or CONNECT which is weird. */
-         	return (pipe);
+         		/* Non-RFC2616 or CONNECT which is weird. */
+         		return (pipe);
      	}
 
 	if (req.request != "GET" && req.request != "HEAD") {
-         	/* We only deal with GET and HEAD by default */
+         	# We only deal with GET and HEAD by default
          	return (pass);
      	}
 
+	# Include the correct Virtual Host configuration file
+	if (req.http.Host == "mattiasgeniar.be") {
+		include "/usr/local/etc/varnish/conf.d/mattiasgeniar.be.vcl";
+	} elseif (req.http.Host == "buyzegemhof.be") {
+		include "/usr/local/etc/varnish/conf.d/buyzegemhof.be.vcl";
+	}		
+
      	if (req.http.Authorization || req.http.Cookie) {
-         	/* Not cacheable by default */
+         	# Not cacheable by default
          	return (pass);
      	}
 
@@ -57,7 +65,7 @@ sub vcl_pipe {
  
 sub vcl_pass {
 	return (pass);
-	}
+}
  
 sub vcl_hash {
      	hash_data(req.url);
@@ -77,16 +85,12 @@ sub vcl_hit {
 sub vcl_miss {
 	return (fetch);
 }
- 
+
+# Handle the TTP request coming from our backend 
 sub vcl_fetch {
-     	if (beresp.ttl <= 0s ||
-         	beresp.http.Set-Cookie ||
-         	beresp.http.Vary == "*") {
- 			/*
- 		 	* Mark as "Hit-For-Pass" for the next 2 minutes
- 		 	*/
- 			set beresp.ttl = 120 s;
- 			return (hit_for_pass);
+     	if (beresp.ttl <= 0s || beresp.http.Set-Cookie || beresp.http.Vary == "*") {
+ 		set beresp.ttl = 120s;
+ 		return (hit_for_pass);
      	}
      	return (deliver);
 }
@@ -95,30 +99,34 @@ sub vcl_deliver {
 	return (deliver);
 }
  
-# sub vcl_error {
-#     set obj.http.Content-Type = "text/html; charset=utf-8";
-#     set obj.http.Retry-After = "5";
-#     synthetic {"
-# <?xml version="1.0" encoding="utf-8"?>
-# <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-#  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-# <html>
-#   <head>
-#     <title>"} + obj.status + " " + obj.response + {"</title>
-#   </head>
-#   <body>
-#     <h1>Error "} + obj.status + " " + obj.response + {"</h1>
-#     <p>"} + obj.response + {"</p>
-#     <h3>Guru Meditation:</h3>
-#     <p>XID: "} + req.xid + {"</p>
-#     <hr>
-#     <p>Varnish cache server</p>
-#   </body>
-# </html>
-# "};
-#     return (deliver);
-# }
-# 
+sub vcl_error {
+     	set obj.http.Content-Type = "text/html; charset=utf-8";
+     	set obj.http.Retry-After = "5";
+
+	# A readable error page (useful when debugging)
+     	synthetic {"
+ <?xml version="1.0" encoding="utf-8"?>
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+ <html>
+   <head>
+     <title>"} + obj.status + " " + obj.response + {"</title>
+   </head>
+   <body>
+     <h1>Error "} + obj.status + " " + obj.response + {"</h1>
+     <p>"} + obj.response + {"</p>
+     <h3>Guru Meditation:</h3>
+     <p>XID: "} + req.xid + {"</p>
+     <hr>
+     <p>Varnish cache server</p>
+   </body>
+ </html>
+ 	"};
+
+
+     	return (deliver);
+}
+ 
 sub vcl_init {
  	return (ok);
 }
