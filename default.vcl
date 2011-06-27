@@ -19,8 +19,6 @@ sub vcl_recv {
 
 	# Normalize the header, remove the port (in case you're testing this on various TCP ports)
 	set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
-	# And remove the "www."-prefix (all my sites serve the same content, regardless of www.
-	set req.http.Host = regsub(req.http.Host, "^www\.", "");
 
      	if (req.request != "GET" &&
        		req.request != "HEAD" &&
@@ -51,8 +49,8 @@ sub vcl_recv {
 		include "/usr/local/etc/varnish/conf.d/buyzegemhof.be-receive.vcl";
 
 		# The wordpress-specific VCL
-		include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";		
-	}		
+		#include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";		
+	}
 
      	if (req.http.Authorization || req.http.Cookie) {
          	# Not cacheable by default
@@ -76,6 +74,7 @@ sub vcl_pass {
 	return (pass);
 }
  
+# The data on which the hashing will take place
 sub vcl_hash {
      	hash_data(req.url);
      	if (req.http.host) {
@@ -83,6 +82,11 @@ sub vcl_hash {
      	} else {
          	hash_data(server.ip);
      	}
+
+	# If the client supports compression, keep that in a different cache
+    	if (req.http.Accept-Encoding) {
+        	hash_data(req.http.Accept-Encoding);
+	}
      
 	return (hash);
 }
@@ -95,31 +99,44 @@ sub vcl_miss {
 	return (fetch);
 }
 
-# Handle the TTP request coming from our backend 
+# Handle the HTTP request coming from our backend 
 sub vcl_fetch {
      	if (beresp.ttl <= 0s || beresp.http.Set-Cookie || beresp.http.Vary == "*") {
  		set beresp.ttl = 120s;
  		return (hit_for_pass);
      	}
 
-	if (beresp.http.Host == "mattiasgeniar.be") {
+	if (req.http.Host == "mattiasgeniar.be") {
 		# A host specific VCL
 		include "/usr/local/etc/varnish/conf.d/mattiasgeniar.be-fetch.vcl";
 
-		# Since this is a Wordpress setup, the WOrdpress-specific Fetch
+		# Since this is a Wordpress setup, the Wordpress-specific Fetch
 		include "/usr/local/etc/varnish/conf.d/_wordpress-fetch.vcl";
-	} elseif (beresp.http.Host == "www.buyzegemhof.be") {
+	} elseif (req.http.Host == "www.buyzegemhof.be") {
 		# A host specific VCL
 		include "/usr/local/etc/varnish/conf.d/buyzegemhof.be-fetch.vcl";
 
 		# Since this is a Wordpress setup, the wordpress-specific Fetch
-		include "/usr/local/etc/varnish/conf.d/_wordpress-fetch.vcl";
+		#include "/usr/local/etc/varnish/conf.d/_wordpress-fetch.vcl";
 	}
 
      	return (deliver);
 }
  
+# The routine when we deliver the HTTP request to the user
+# Last chance to modify headers that are sent to the client
 sub vcl_deliver {
+	if (obj.hits > 0) { 
+		set resp.http.X-Cache = "cached";
+	} else {
+		set resp.http.x-Cache = "uncached";
+	}
+
+	# Remove some headers: PHP version
+	unset resp.http.X-Powered-By;
+	# Remove some headers: Apache version & OS
+	unset resp.http.Server;
+
 	return (deliver);
 }
  
@@ -134,15 +151,65 @@ sub vcl_error {
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
  <html>
    <head>
-     <title>"} + obj.status + " " + obj.response + {"</title>
+     	<title>"} + obj.status + " " + obj.response + {"</title>
+	<style>
+		body {
+			font-family: Verdana;
+			font-size: 12px;
+		}
+
+		table {
+			border: 0px;
+		}
+
+		th {
+			font-size: 16px;
+			font-weight: bold;
+			text-align: left;
+		}
+
+		td {
+			vertical-align: top;
+			border-style: dashed;
+			border-color: gray;
+			padding: 3px;
+			border-width: 1px;
+			
+		}
+
+		.overflow_div {
+			width: 950px;
+			overflow: auto;
+		}
+	</style>
+	
    </head>
    <body>
-     <h1>Error "} + obj.status + " " + obj.response + {"</h1>
-     <p>"} + obj.response + {"</p>
-     <h3>Guru Meditation:</h3>
-     <p>XID: "} + req.xid + {"</p>
-     <hr>
-     <p>Varnish cache server</p>
+     	<h1>Error "} + obj.status + " " + obj.response + {"</h1>
+     	<p>"} + obj.response + {"</p>
+     	<h3>Varnish Variables:</h3>
+	<div class="overflow_div">
+	   <table width="950px" cellspacing="4" cellpadding="2">
+		<tr>
+			<th>Variable</th>
+			<th>Value</th>
+		</tr>
+		<tr>
+			<td width="20%">XID</td>
+			<td>"} + req.xid + {"</td>
+		</tr>
+		<tr>
+                        <td>HTTP host</td>
+                        <td>"} + req.http.Host + {"</td>
+                </tr>
+		<tr>
+                        <td>Cookies</td>
+                        <td>"} + regsuball(req.http.cookie, "; ", "<br />") + {"</td>
+                </tr>
+	   </table>
+	</div>
+
+     	<p>Varnish cache server</p>
    </body>
  </html>
  	"};
