@@ -40,9 +40,18 @@ sub vcl_recv {
 
 	# Include the correct Virtual Host configuration file
 	if (req.http.Host == "mattiasgeniar.be") {
-		include "/usr/local/etc/varnish/conf.d/mattiasgeniar.be.vcl";
+		# A site-specific VCL for the vcl-receive
+		include "/usr/local/etc/varnish/conf.d/mattiasgeniar.be-receive.vcl";
+
+		# The Wordpress-specific VCL
+		include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";
+		
 	} elseif (req.http.Host == "buyzegemhof.be") {
-		include "/usr/local/etc/varnish/conf.d/buyzegemhof.be.vcl";
+		# A site-specific VCL for the vcl-receive
+		include "/usr/local/etc/varnish/conf.d/buyzegemhof.be-receive.vcl";
+
+		# The wordpress-specific VCL
+		include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";		
 	}		
 
      	if (req.http.Authorization || req.http.Cookie) {
@@ -92,6 +101,21 @@ sub vcl_fetch {
  		set beresp.ttl = 120s;
  		return (hit_for_pass);
      	}
+
+	if (beresp.http.Host == "mattiasgeniar.be") {
+		# A host specific VCL
+		include "/usr/local/etc/varnish/conf.d/mattiasgeniar.be-fetch.vcl";
+
+		# Since this is a Wordpress setup, the WOrdpress-specific Fetch
+		include "/usr/local/etc/varnish/conf.d/_wordpress-fetch.vcl";
+	} elseif (beresp.http.Host == "www.buyzegemhof.be") {
+		# A host specific VCL
+		include "/usr/local/etc/varnish/conf.d/buyzegemhof.be-fetch.vcl";
+
+		# Since this is a Wordpress setup, the wordpress-specific Fetch
+		include "/usr/local/etc/varnish/conf.d/_wordpress-fetch.vcl";
+	}
+
      	return (deliver);
 }
  

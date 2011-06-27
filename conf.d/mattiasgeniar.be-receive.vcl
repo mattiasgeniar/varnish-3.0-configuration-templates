@@ -16,6 +16,9 @@ if (req.http.Cookie ~ "wordpress_" || req.http.Cookie ~ "comment_") {
 # Remove any Google Analytics based cookies
 set req.http.Cookie = regsuball(req.http.Cookie, "__utm.=[^;]+(; )?", "");
 
+# Remove the Quant Capital cookies (added by some plugin, all __qca)
+set req.http.Cookie = regsuball(req.http.Cookie, "__qca.=[^;]+(; )?", "");
+
 # Are there cookies left with only spaces or that are empty?
 if (req.http.cookie ~ "^ *$") {
 	remove req.http.cookie;
