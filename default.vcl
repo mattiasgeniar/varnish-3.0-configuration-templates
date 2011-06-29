@@ -3,8 +3,9 @@
 backend default {
 	# I have Virtual Hosts that only listen to the Public IP
 	# so no 127.0.0.1 for me
+	# Backend is running on port 81
 	.host = "193.239.210.183";
-     	.port = "80";
+     	.port = "81";
 }
 
 # Handle the HTTP request received by the client 
@@ -37,19 +38,29 @@ sub vcl_recv {
      	}
 
 	# Include the correct Virtual Host configuration file
-	if (req.http.Host == "mattiasgeniar.be") {
+	if (req.http.Host == "mattiasgeniar.be" || req.http.Host == "geniar.be" || req.http.host == "minimatti.be") {
+		# Redirect the user if it's not on the "real" domain name (a 301 permanent redirect, SEO)
+		if (req.http.Host != "mattiasgeniar.be") {
+			error 701 "mattiasgeniar.be";
+		}
+
 		# A site-specific VCL for the vcl-receive
 		include "/usr/local/etc/varnish/conf.d/mattiasgeniar.be-receive.vcl";
 
 		# The Wordpress-specific VCL
 		include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";
 		
-	} elseif (req.http.Host == "buyzegemhof.be") {
+	} elseif (req.http.Host ~ "(www\.)?buyzegemhof.be") {
+		# Redirect the user if it's not on the "real" domain
+		if (req.http.Host != "www.buyzegemhof.be") {
+			error 701 "www.buyzegemhof.be";
+		}
+
 		# A site-specific VCL for the vcl-receive
 		include "/usr/local/etc/varnish/conf.d/buyzegemhof.be-receive.vcl";
 
 		# The wordpress-specific VCL
-		#include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";		
+		include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";		
 	}
 
      	if (req.http.Authorization || req.http.Cookie) {
@@ -141,79 +152,16 @@ sub vcl_deliver {
 }
  
 sub vcl_error {
-     	set obj.http.Content-Type = "text/html; charset=utf-8";
-     	set obj.http.Retry-After = "5";
-
-	# A readable error page (useful when debugging)
-     	synthetic {"
- <?xml version="1.0" encoding="utf-8"?>
- <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
- <html>
-   <head>
-     	<title>"} + obj.status + " " + obj.response + {"</title>
-	<style>
-		body {
-			font-family: Verdana;
-			font-size: 12px;
-		}
-
-		table {
-			border: 0px;
-		}
-
-		th {
-			font-size: 16px;
-			font-weight: bold;
-			text-align: left;
-		}
-
-		td {
-			vertical-align: top;
-			border-style: dashed;
-			border-color: gray;
-			padding: 3px;
-			border-width: 1px;
-			
-		}
-
-		.overflow_div {
-			width: 950px;
-			overflow: auto;
-		}
-	</style>
-	
-   </head>
-   <body>
-     	<h1>Error "} + obj.status + " " + obj.response + {"</h1>
-     	<p>"} + obj.response + {"</p>
-     	<h3>Varnish Variables:</h3>
-	<div class="overflow_div">
-	   <table width="950px" cellspacing="4" cellpadding="2">
-		<tr>
-			<th>Variable</th>
-			<th>Value</th>
-		</tr>
-		<tr>
-			<td width="20%">XID</td>
-			<td>"} + req.xid + {"</td>
-		</tr>
-		<tr>
-                        <td>HTTP host</td>
-                        <td>"} + req.http.Host + {"</td>
-                </tr>
-		<tr>
-                        <td>Cookies</td>
-                        <td>"} + regsuball(req.http.cookie, "; ", "<br />") + {"</td>
-                </tr>
-	   </table>
-	</div>
-
-     	<p>Varnish cache server</p>
-   </body>
- </html>
- 	"};
-
+	if (obj.status == 700) {
+		# Include a general error message handler for debugging purposes
+		include "/usr/local/etc/varnish/conf.d/_error.vcl";
+	} elseif (obj.status == 701) {
+		# Redirect error handler
+		set obj.http.Location = "http://" + obj.response + req.url;
+		# Change this to 302 if you want temporary redirects
+		set obj.status = 301;
+		return (deliver);
+	}
 
      	return (deliver);
 }
