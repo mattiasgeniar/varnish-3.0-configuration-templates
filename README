@@ -1,0 +1,12 @@
+A set of configuration samples used for Varnish 3.0. This includes templates for:
+- Wordpress
+- Drupal (WIP)
+- Joomla (WIP)
+- Fork CMS (WIP)
+
+And various configuration for:
+- Server-side URL rewriting
+- Clean error pages for debugging
+- Virtual Host implementations
+- Various header normalizations
+- Cookie manipulations
