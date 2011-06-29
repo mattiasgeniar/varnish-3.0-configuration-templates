@@ -5,5 +5,5 @@ if (req.url ~ "wp-content/themes/" && req.url ~ "\.(css|js|png|gif|jp(e?)g)") {
 	unset beresp.http.cookie;
 }
 
-# A TTL of a day
-set beresp.ttl = 86400s;
+# A TTL of 30 minutes
+set beresp.ttl = 1800s;

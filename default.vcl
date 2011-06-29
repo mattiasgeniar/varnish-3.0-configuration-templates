@@ -8,6 +8,12 @@ backend default {
      	.port = "81";
 }
 
+acl purge {
+	# For now, I'll only allow purges coming from localhost
+	"127.0.0.1";
+	"localhost";
+}
+
 # Handle the HTTP request received by the client 
 sub vcl_recv {
 	if (req.restarts == 0) {
@@ -21,6 +27,19 @@ sub vcl_recv {
 	# Normalize the header, remove the port (in case you're testing this on various TCP ports)
 	set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
 
+	# Allow purging
+	if (req.request == "PURGE") {
+		if (!client.ip ~ purge) {
+			# Not from an allowed IP? Then die with an error.
+			error 405 "This IP is not allowed to send PURGE requests.";
+		}
+	
+		# If you got this stage (and didn't error out above), do a cache-lookup
+		# That will force entry into vcl_hit() or vcl_miss() below and purge the actual cache
+		return (lookup);
+        }
+
+	# Only deal with "normal" types
      	if (req.request != "GET" &&
        		req.request != "HEAD" &&
       	 	req.request != "PUT" &&
@@ -103,10 +122,22 @@ sub vcl_hash {
 }
  
 sub vcl_hit {
+	# Allow purges
+	if (req.request == "PURGE") {
+		purge;
+		error 200 "Purged.";
+	}
+
 	return (deliver);
 }
  
 sub vcl_miss {
+	# Allow purges
+	if (req.request == "PURGE") {
+		purge;
+		error 200 "Purged.";
+	}
+        
 	return (fetch);
 }
 
