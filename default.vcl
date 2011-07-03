@@ -86,6 +86,12 @@ sub vcl_recv {
 
 		# The Drupal 7-specific VCL
 		include "/usr/local/etc/varnish/conf.d/_drupal_7-receive.vcl";
+	} elseif (req.http.Host ~ "forkcms.mojah.be") {
+		# A site-specific VCL for the vcl-receive
+		include "/usr/local/etc/varnish/conf.d/forkcms.mojah.be-receive.vcl";
+
+		# The Drupal 7-specific VCL
+		include "/usr/local/etc/varnish/conf.d/_forkcms-receive.vcl";
 	}
 
      	if (req.http.Authorization || req.http.Cookie) {
@@ -161,18 +167,27 @@ sub vcl_fetch {
 
 		# Since this is a Wordpress setup, the Wordpress-specific Fetch
 		include "/usr/local/etc/varnish/conf.d/_wordpress-fetch.vcl";
+
 	} elseif (req.http.Host == "www.buyzegemhof.be") {
 		# A host specific VCL
 		include "/usr/local/etc/varnish/conf.d/buyzegemhof.be-fetch.vcl";
 
 		# Since this is a Wordpress setup, the wordpress-specific Fetch
 		#include "/usr/local/etc/varnish/conf.d/_wordpress-fetch.vcl";
+
 	} elseif (req.http.Host == "drupal.mojah.be") {
 		# A host specific VCL
 		include "/usr/local/etc/varnish/conf.d/drupal.mojah.be-fetch.vcl";
 		
 		# Include the Drupal 7 specific VCL
 		include "/usr/local/etc/varnish/conf.d/_drupal_7-fetch.vcl";
+
+	} elseif (req.http.Host == "forkcms.mojah.be") {
+		# A host specific VCL
+		include "/usr/local/etc/varnish/conf.d/forkcms.mojah.be-fetch.vcl";
+
+		# Include the Fork CMS specific VCL
+		include "/usr/local/etc/varnish/conf.d/_forkcms-fetch.vcl";
 	}
 
      	return (deliver);
@@ -189,6 +204,7 @@ sub vcl_deliver {
 
 	# Remove some headers: PHP version
 	unset resp.http.X-Powered-By;
+
 	# Remove some headers: Apache version & OS
 	unset resp.http.Server;
 
@@ -199,12 +215,14 @@ sub vcl_error {
 	if (obj.status == 700) {
 		# Include a general error message handler for debugging purposes
 		include "/usr/local/etc/varnish/conf.d/_error.vcl";
+
 	} elseif (obj.status == 701) {
 		# Redirect error handler
 		set obj.http.Location = "http://" + obj.response + req.url;
 		# Change this to 302 if you want temporary redirects
 		set obj.status = 301;
 		return (deliver);
+
 	}
 
      	return (deliver);
