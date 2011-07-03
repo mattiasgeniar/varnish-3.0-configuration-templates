@@ -155,11 +155,6 @@ sub vcl_miss {
 
 # Handle the HTTP request coming from our backend 
 sub vcl_fetch {
-     	if (beresp.ttl <= 0s || beresp.http.Set-Cookie || beresp.http.Vary == "*") {
- 		set beresp.ttl = 120s;
- 		return (hit_for_pass);
-     	}
-
 	# I can use direct matching on the host, since I normalized the host header in the VCL Receive
 	if (req.http.Host == "mattiasgeniar.be") {
 		# A host specific VCL
@@ -189,6 +184,12 @@ sub vcl_fetch {
 		# Include the Fork CMS specific VCL
 		include "/usr/local/etc/varnish/conf.d/_forkcms-fetch.vcl";
 	}
+
+	# Temporarily removed
+	#if (beresp.ttl <= 0s || beresp.http.Set-Cookie || beresp.http.Vary == "*") {
+	#	set beresp.ttl = 120s;
+	#	return (hit_for_pass);
+	#}
 
      	return (deliver);
 }
