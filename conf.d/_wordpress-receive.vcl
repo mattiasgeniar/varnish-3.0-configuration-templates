@@ -6,6 +6,9 @@ if (req.url ~ "/wp-(login|admin)") {
         return (pass);
 }
 
+# Remove the "has_js" cookie
+set req.http.Cookie = regsuball(req.http.Cookie, "has_js=[^;]+(; )?", "");
+
 # Remove any Google Analytics based cookies
 set req.http.Cookie = regsuball(req.http.Cookie, "__utm.=[^;]+(; )?", "");
 
