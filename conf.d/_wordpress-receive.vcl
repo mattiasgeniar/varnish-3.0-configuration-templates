@@ -1,5 +1,4 @@
-# A configuration file specific to the site mattiasgeniar.be
-# Based on Wordpress (urgh, cookie nightmare)
+# A configuration file specific to Wordpress 3.x
 
 # Either the admin pages or the login
 if (req.url ~ "/wp-(login|admin)") {
