@@ -80,6 +80,12 @@ sub vcl_recv {
 
 		# The wordpress-specific VCL
 		include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";		
+	} elseif (req.http.Host ~ "drupal.mojah.be") {
+		# A site-specific VCL for the vcl-receive
+		include "/usr/local/etc/varnish/conf.d/drupal.mojah.be-receive.vcl";
+
+		# The Drupal 7-specific VCL
+		include "/usr/local/etc/varnish/conf.d/_drupal_7-receive.vcl";
 	}
 
      	if (req.http.Authorization || req.http.Cookie) {
@@ -148,6 +154,7 @@ sub vcl_fetch {
  		return (hit_for_pass);
      	}
 
+	# I can use direct matching on the host, since I normalized the host header in the VCL Receive
 	if (req.http.Host == "mattiasgeniar.be") {
 		# A host specific VCL
 		include "/usr/local/etc/varnish/conf.d/mattiasgeniar.be-fetch.vcl";
@@ -160,6 +167,12 @@ sub vcl_fetch {
 
 		# Since this is a Wordpress setup, the wordpress-specific Fetch
 		#include "/usr/local/etc/varnish/conf.d/_wordpress-fetch.vcl";
+	} elseif (req.http.Host == "drupal.mojah.be") {
+		# A host specific VCL
+		include "/usr/local/etc/varnish/conf.d/drupal.mojah.be-fetch.vcl";
+		
+		# Include the Drupal 7 specific VCL
+		include "/usr/local/etc/varnish/conf.d/_drupal_7-fetch.vcl";
 	}
 
      	return (deliver);
