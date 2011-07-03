@@ -21,7 +21,7 @@ if (req.http.cookie ~ "^ *$") {
 }
 
 # Static content unique to the theme can be cached (so no user uploaded images)
-if (req.url ~ "/themes/" && req.url ~ "\.(css|js|png|gif|jp(e)?g)") {
+if (req.url ~ "^/themes/" && req.url ~ "\.(css|js|png|gif|jp(e)?g)") {
         unset req.http.cookie;
 }
 
