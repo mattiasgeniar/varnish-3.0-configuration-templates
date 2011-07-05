@@ -42,12 +42,6 @@ if (req.http.cookie ~ "comment_(website|email|author)") {
 # If your PHP configuration has a different naming for the PHP Session IDs, change it here
 set req.http.Cookie = regsuball(req.http.Cookie, "PHPSESSID=[^;]+(; )?", "");
 
-# Static content gets an additional "m=timestamp" suffix appended to it, which is worthless
-if (req.url ~ "\.(css|js)") {
-	# Replace the "m=1309719542" with "m=1", so it's unique
-	set req.url = regsuball(req.url, "m=([0-9])+", "m=1");
-}
-
 # Uncomment this to trigger the vcl_error() subroutine, which will HTML output you some variables (HTTP 700 = pretty debug)
 #error 700;
 
