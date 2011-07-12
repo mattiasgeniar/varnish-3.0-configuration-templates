@@ -92,6 +92,8 @@ sub vcl_recv {
 
 		# The Drupal 7-specific VCL
 		include "/usr/local/etc/varnish/conf.d/_forkcms-receive.vcl";
+	} elseif (req.http.Host == "pwgen.mattiasgeniar.be") {
+		return (pass);
 	}
 
      	if (req.http.Authorization || req.http.Cookie) {
