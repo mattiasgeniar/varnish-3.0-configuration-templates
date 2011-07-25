@@ -6,6 +6,7 @@ backend default {
 	# Backend is running on port 81
 	.host = "193.239.210.183";
      	.port = "81";
+	.first_byte_timeout = 300s;
 }
 
 acl purge {
@@ -93,6 +94,9 @@ sub vcl_recv {
 		# The Drupal 7-specific VCL
 		include "/usr/local/etc/varnish/conf.d/_forkcms-receive.vcl";
 	} elseif (req.http.Host == "pwgen.mattiasgeniar.be") {
+		return (pass);
+	} elseif (req.http.Host == "dev.mozbx.net") {
+		# Don't interfere with my devving
 		return (pass);
 	}
 
