@@ -115,6 +115,8 @@ sub vcl_pipe {
      	# set bereq.http.connection = "close";
      	# here.  It is not set by default as it might break some broken web
      	# applications, like IIS with NTLM authentication.
+
+	set req.http.connection = "close";
 	return (pipe);
 }
  
