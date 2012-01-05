@@ -18,7 +18,7 @@ acl purge {
 # Handle the HTTP request received by the client 
 sub vcl_recv {
 	if (req.restarts == 0) {
- 		if (req.http.x-forwarded-for) {
+ 		if (req.http.X-Forwarded-For) {
  	    		set req.http.X-Forwarded-For = req.http.X-Forwarded-For + ", " + client.ip;
 	 	} else {
 			set req.http.X-Forwarded-For = client.ip;
@@ -116,7 +116,7 @@ sub vcl_pipe {
      	# here.  It is not set by default as it might break some broken web
      	# applications, like IIS with NTLM authentication.
 
-	set req.http.connection = "close";
+	set bereq.http.connection = "close";
 	return (pipe);
 }
  
