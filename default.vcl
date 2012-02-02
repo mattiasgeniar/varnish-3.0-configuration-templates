@@ -98,6 +98,9 @@ sub vcl_recv {
 	} elseif (req.http.Host == "dev.mozbx.net") {
 		# Don't interfere with my devving
 		return (pass);
+	} else {
+		# Something not specified? Pass, I probably don't want it cached.
+		return (pass);
 	}
 
      	if (req.http.Authorization || req.http.Cookie) {
@@ -116,7 +119,7 @@ sub vcl_pipe {
      	# here.  It is not set by default as it might break some broken web
      	# applications, like IIS with NTLM authentication.
 
-	set bereq.http.connection = "close";
+	set bereq.http.Connection = "Close";
 	return (pipe);
 }
  
@@ -155,7 +158,7 @@ sub vcl_miss {
 	# Allow purges
 	if (req.request == "PURGE") {
 		purge;
-		error 200 "Purged.";
+		error 200 "URL Purged.";
 	}
         
 	return (fetch);
@@ -231,7 +234,6 @@ sub vcl_error {
 		# Change this to 302 if you want temporary redirects
 		set obj.status = 301;
 		return (deliver);
-
 	}
 
      	return (deliver);
