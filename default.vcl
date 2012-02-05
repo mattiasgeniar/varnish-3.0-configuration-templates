@@ -66,6 +66,11 @@ sub vcl_recv {
 		set req.url = regsub(req.url, "\?$", "");
 	}
 
+	# Strip hash, server doesn't need it.
+	if (req.url ~ "\#") {
+		set req.url=regsub(req.url,"\#.*$","");
+	}
+
 	# Some generic cookie manipulation, useful for all templates that follow
 	# Remove the "has_js" cookie
 	set req.http.Cookie = regsuball(req.http.Cookie, "has_js=[^;]+(; )?", "");
