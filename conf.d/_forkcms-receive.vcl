@@ -6,32 +6,6 @@ if (req.url ~ "(private|backend)") {
         return (pass);
 }
 
-# Remove the "has_js" cookie
-set req.http.Cookie = regsuball(req.http.Cookie, "has_js=[^;]+(; )?", "");
-
-# Remove any Google Analytics based cookies
-set req.http.Cookie = regsuball(req.http.Cookie, "__utm.=[^;]+(; )?", "");
-
-# Are there cookies left with only spaces or that are empty?
-if (req.http.cookie ~ "^ *$") {
-        unset req.http.cookie;
-}
-
-# Normalize Accept-Encoding header (straight from the manual: https://www.varnish-cache.org/docs/3.0/tutorial/vary.html)
-if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
-                # No point in compressing these
-                remove req.http.Accept-Encoding;
-        } elsif (req.http.Accept-Encoding ~ "gzip") {
-                set req.http.Accept-Encoding = "gzip";
-        } elsif (req.http.Accept-Encoding ~ "deflate") {
-                set req.http.Accept-Encoding = "deflate";
-        } else {
-                # unkown algorithm
-                remove req.http.Accept-Encoding;
-        }
-}
-
 # Someone placed comments on the site, there are still cookies left
 if (req.http.cookie ~ "comment_(website|email|author)") {
 	# Don't cache these pages, allow direct request

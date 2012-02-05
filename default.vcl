@@ -57,13 +57,42 @@ sub vcl_recv {
         return (pass);
     }
 
-	# Some generic URL manipulation, useful for all template that follow
+	# Some generic URL manipulation, useful for all templates that follow
 	# First remove the Google Analytics added parameters, useless for our backend
 	if(req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
 		set req.url = regsuball(req.url, "&(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "");
 		set req.url = regsuball(req.url, "\?(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "?");
 		set req.url = regsub(req.url, "\?&", "?");
 		set req.url = regsub(req.url, "\?$", "");
+	}
+
+	# Some generic cookie manipulation, useful for all templates that follow
+	# Remove the "has_js" cookie
+	set req.http.Cookie = regsuball(req.http.Cookie, "has_js=[^;]+(; )?", "");
+	# Remove any Google Analytics based cookies
+	set req.http.Cookie = regsuball(req.http.Cookie, "__utm.=[^;]+(; )?", "");
+	# Remove the Quant Capital cookies (added by some plugin, all __qca)
+	set req.http.Cookie = regsuball(req.http.Cookie, "__qc.=[^;]+(; )?", "");
+
+	# Are there cookies left with only spaces or that are empty?
+	if (req.http.cookie ~ "^ *$") {
+		unset req.http.cookie;
+	}
+
+	# Normalize Accept-Encoding header
+	# straight from the manual: https://www.varnish-cache.org/docs/3.0/tutorial/vary.html
+	if (req.http.Accept-Encoding) {
+		if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+			# No point in compressing these
+			remove req.http.Accept-Encoding;
+		} elsif (req.http.Accept-Encoding ~ "gzip") {
+			set req.http.Accept-Encoding = "gzip";
+		} elsif (req.http.Accept-Encoding ~ "deflate") {
+			set req.http.Accept-Encoding = "deflate";
+		} else {
+			# unkown algorithm
+			remove req.http.Accept-Encoding;
+		}
 	}
 
 	# Include the correct Virtual Host configuration file
