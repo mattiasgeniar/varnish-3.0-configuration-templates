@@ -68,7 +68,12 @@ sub vcl_recv {
 
 	# Strip hash, server doesn't need it.
 	if (req.url ~ "\#") {
-		set req.url=regsub(req.url,"\#.*$","");
+		set req.url = regsub(req.url, "\#.*$", "");
+	}
+
+	# Strip a trailing ? if it exists
+	if (req.url ~ "\?$") {
+		set req.url = regsub(req.url, "\?$", "");
 	}
 
 	# Some generic cookie manipulation, useful for all templates that follow
@@ -76,6 +81,9 @@ sub vcl_recv {
 	set req.http.Cookie = regsuball(req.http.Cookie, "has_js=[^;]+(; )?", "");
 	# Remove any Google Analytics based cookies
 	set req.http.Cookie = regsuball(req.http.Cookie, "__utm.=[^;]+(; )?", "");
+	set req.http.Cookie = regsuball(req.http.Cookie, "utmctr=[^;]+(; )?", "");
+	set req.http.Cookie = regsuball(req.http.Cookie, "utmcmd.=[^;]+(; )?", "");
+	set req.http.Cookie = regsuball(req.http.Cookie, "utmccn.=[^;]+(; )?", "");
 	# Remove the Quant Capital cookies (added by some plugin, all __qca)
 	set req.http.Cookie = regsuball(req.http.Cookie, "__qc.=[^;]+(; )?", "");
 
