@@ -1,8 +1,8 @@
 A set of configuration samples used for Varnish 3.0. This includes templates for:
 - Wordpress
-- Drupal (WIP)
+- Drupal (works decently for Drupal 7, depends on your addons obviously)
 - Joomla (WIP)
-- Fork CMS (WIP)
+- Fork CMS (works decently enough)
 
 And various configuration for:
 - Server-side URL rewriting
