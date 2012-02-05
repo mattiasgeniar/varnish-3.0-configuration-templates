@@ -57,6 +57,15 @@ sub vcl_recv {
         return (pass);
     }
 
+	# Some generic URL manipulation, useful for all template that follow
+	# First remove the Google Analytics added parameters, useless for our backend
+	if(req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
+		set req.url = regsuball(req.url, "&(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "");
+		set req.url = regsuball(req.url, "\?(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "?");
+		set req.url = regsub(req.url, "\?&", "?");
+		set req.url = regsub(req.url, "\?$", "");
+	}
+
 	# Include the correct Virtual Host configuration file
 	if (req.http.Host == "mattiasgeniar.be" || req.http.Host == "geniar.be" || req.http.host == "minimatti.be") {
 		# Redirect the user if it's not on the "real" domain name (a 301 permanent redirect, SEO)
