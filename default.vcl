@@ -5,7 +5,7 @@ backend default {
 	# so no 127.0.0.1 for me
 	# Backend is running on port 81
 	.host = "193.239.210.183";
-     	.port = "81";
+   	.port = "81";
 	.first_byte_timeout = 300s;
 }
 
@@ -23,7 +23,7 @@ sub vcl_recv {
 	 	} else {
 			set req.http.X-Forwarded-For = client.ip;
 	 	}
-     	}
+   	}
 
 	# Normalize the header, remove the port (in case you're testing this on various TCP ports)
 	set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
@@ -38,10 +38,10 @@ sub vcl_recv {
 		# If you got this stage (and didn't error out above), do a cache-lookup
 		# That will force entry into vcl_hit() or vcl_miss() below and purge the actual cache
 		return (lookup);
-        }
+	}
 
 	# Only deal with "normal" types
-     	if (req.request != "GET" &&
+    if (req.request != "GET" &&
        		req.request != "HEAD" &&
       	 	req.request != "PUT" &&
        		req.request != "POST" &&
@@ -50,12 +50,12 @@ sub vcl_recv {
       	 	req.request != "DELETE") {
          		/* Non-RFC2616 or CONNECT which is weird. */
          		return (pipe);
-     	}
+    }
 
 	if (req.request != "GET" && req.request != "HEAD") {
-         	# We only deal with GET and HEAD by default
-         	return (pass);
-     	}
+    	# We only deal with GET and HEAD by default
+        return (pass);
+    }
 
 	# Include the correct Virtual Host configuration file
 	if (req.http.Host == "mattiasgeniar.be" || req.http.Host == "geniar.be" || req.http.host == "minimatti.be") {
@@ -80,19 +80,22 @@ sub vcl_recv {
 		include "/usr/local/etc/varnish/conf.d/buyzegemhof.be-receive.vcl";
 
 		# The wordpress-specific VCL
-		include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";		
+		include "/usr/local/etc/varnish/conf.d/_wordpress-receive.vcl";
+
 	} elseif (req.http.Host ~ "drupal.mojah.be") {
 		# A site-specific VCL for the vcl-receive
 		include "/usr/local/etc/varnish/conf.d/drupal.mojah.be-receive.vcl";
 
 		# The Drupal 7-specific VCL
 		include "/usr/local/etc/varnish/conf.d/_drupal_7-receive.vcl";
+
 	} elseif (req.http.Host ~ "forkcms.mojah.be") {
 		# A site-specific VCL for the vcl-receive
 		include "/usr/local/etc/varnish/conf.d/forkcms.mojah.be-receive.vcl";
 
 		# The Drupal 7-specific VCL
 		include "/usr/local/etc/varnish/conf.d/_forkcms-receive.vcl";
+
 	} elseif (req.http.Host == "pwgen.mattiasgeniar.be") {
 		return (pass);
 	} elseif (req.http.Host == "dev.mozbx.net") {
@@ -103,21 +106,21 @@ sub vcl_recv {
 		return (pass);
 	}
 
-     	if (req.http.Authorization || req.http.Cookie) {
-         	# Not cacheable by default
-         	return (pass);
-     	}
+	if (req.http.Authorization || req.http.Cookie) {
+    	# Not cacheable by default
+        return (pass);
+    }
 
 	return (lookup);
 }
  
 sub vcl_pipe {
-     	# Note that only the first request to the backend will have
-     	# X-Forwarded-For set.  If you use X-Forwarded-For and want to
-     	# have it set for all requests, make sure to have:
-     	# set bereq.http.connection = "close";
-     	# here.  It is not set by default as it might break some broken web
-     	# applications, like IIS with NTLM authentication.
+  	# Note that only the first request to the backend will have
+  	# X-Forwarded-For set.  If you use X-Forwarded-For and want to
+  	# have it set for all requests, make sure to have:
+  	# set bereq.http.connection = "close";
+  	# here.  It is not set by default as it might break some broken web
+	# applications, like IIS with NTLM authentication.
 
 	set bereq.http.Connection = "Close";
 	return (pipe);
@@ -129,16 +132,16 @@ sub vcl_pass {
  
 # The data on which the hashing will take place
 sub vcl_hash {
-     	hash_data(req.url);
-     	if (req.http.host) {
-         	hash_data(req.http.host);
-     	} else {
-         	hash_data(server.ip);
-     	}
+   	hash_data(req.url);
+   	if (req.http.host) {
+       	hash_data(req.http.host);
+   	} else {
+       	hash_data(server.ip);
+   	}
 
 	# If the client supports compression, keep that in a different cache
-    	if (req.http.Accept-Encoding) {
-        	hash_data(req.http.Accept-Encoding);
+  	if (req.http.Accept-Encoding) {
+      	hash_data(req.http.Accept-Encoding);
 	}
      
 	return (hash);
@@ -202,7 +205,7 @@ sub vcl_fetch {
 	#	return (hit_for_pass);
 	#}
 
-     	return (deliver);
+   	return (deliver);
 }
  
 # The routine when we deliver the HTTP request to the user
@@ -236,7 +239,7 @@ sub vcl_error {
 		return (deliver);
 	}
 
-     	return (deliver);
+   	return (deliver);
 }
  
 sub vcl_init {
