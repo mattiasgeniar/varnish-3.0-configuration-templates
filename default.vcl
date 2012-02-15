@@ -41,7 +41,7 @@ sub vcl_recv {
 	}
 
 	# Only deal with "normal" types
-    if (req.request != "GET" &&
+	if (req.request != "GET" &&
        		req.request != "HEAD" &&
       	 	req.request != "PUT" &&
        		req.request != "POST" &&
@@ -50,12 +50,12 @@ sub vcl_recv {
       	 	req.request != "DELETE") {
          		/* Non-RFC2616 or CONNECT which is weird. */
          		return (pipe);
-    }
+	}
 
 	if (req.request != "GET" && req.request != "HEAD") {
-    	# We only deal with GET and HEAD by default
-        return (pass);
-    }
+		# We only deal with GET and HEAD by default
+		return (pass);
+	}
 
 	# Some generic URL manipulation, useful for all templates that follow
 	# First remove the Google Analytics added parameters, useless for our backend
@@ -158,9 +158,9 @@ sub vcl_recv {
 	}
 
 	if (req.http.Authorization || req.http.Cookie) {
-    	# Not cacheable by default
-        return (pass);
-    }
+		# Not cacheable by default
+		return (pass);
+	}
 
 	return (lookup);
 }
@@ -183,16 +183,17 @@ sub vcl_pass {
  
 # The data on which the hashing will take place
 sub vcl_hash {
-   	hash_data(req.url);
-   	if (req.http.host) {
-       	hash_data(req.http.host);
-   	} else {
-       	hash_data(server.ip);
-   	}
+	hash_data(req.url);
+
+	if (req.http.host) {
+		hash_data(req.http.host);
+	} else {
+		hash_data(server.ip);
+	}
 
 	# If the client supports compression, keep that in a different cache
-  	if (req.http.Accept-Encoding) {
-      	hash_data(req.http.Accept-Encoding);
+	if (req.http.Accept-Encoding) {
+		hash_data(req.http.Accept-Encoding);
 	}
      
 	return (hash);
