@@ -27,9 +27,6 @@ if (req.url ~ "/wp-content/uploads/") {
 	return (pass);
 }
 
-# Uncomment this to trigger the vcl_error() subroutine, which will HTML output you some variables (HTTP 700 = pretty debug)
-#error 700;
-
 # Check the cookies for wordpress-specific items
 if (req.http.Cookie ~ "wordpress_" || req.http.Cookie ~ "comment_") {
         # A wordpress specific cookie has been set
