@@ -28,16 +28,16 @@ synthetic {"
     </head>
     <body>
         <div class="container">
-            <h1>Error "} + obj.status + " " + obj.response + {"</h1>
-            <div class="alert alert-error"><i class="icon-warning-sign"></i> D&eacute;sol&eacute; mais la page ne peut etre charg&eacute; correctement. <i class="icon-warning-sign"></i></div>
-            <div class="alert alert-error"><i class="icon-warning-sign"></i> We're very sorry, but the page could not be loaded properly. <i class="icon-warning-sign"></i></div>
+            <h1 class="pagination-centered">Error "} + obj.status + " " + obj.response + {"</h1>
+            <div class="alert alert-error pagination-centered"><i class="icon-warning-sign"></i> D&eacute;sol&eacute; mais la page ne peut etre charg&eacute; correctement. <i class="icon-warning-sign"></i></div>
+            <div class="alert alert-error pagination-centered"><i class="icon-warning-sign"></i> We're very sorry, but the page could not be loaded properly. <i class="icon-warning-sign"></i></div>
             <blockquote>Toutes nos escuses, Cela va etre fix&eacute; rapidement.<br \>
                 This should be fixed very soon, and we apologize for any inconvenience
             </blockquote>
 
             <hr \>
-            <h2>Debug Informations</h2>
-            <table class="table table-striped table-bordered table-condensed"><caption>Varnish Variables:</caption>
+
+            <table class="table table-striped table-bordered table-condensed"><caption><h2 class="pagination-centered">Debug Informations</h2></caption>
                 <tr>
                     <th>Variable</th>
                     <th>Value</th>
@@ -116,12 +116,8 @@ synthetic {"
                 </tr>
             </table>
         </div>
-    </div>
-    <footer class="container">
-        <center>
-            <p>Error page</p>
-        </center>
-    </footer>
-</body>
+        <footer class="container pagination-centered">
+        </footer>
+    </body>
 </html>
 "};
