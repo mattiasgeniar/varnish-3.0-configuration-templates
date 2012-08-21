@@ -2,8 +2,8 @@
 
 # Either the admin pages or the login
 if (req.url ~ "/wp-(login|admin)") {
-        # Don't cache, pass to backend
-        return (pass);
+    # Don't cache, pass to backend
+    return (pass);
 }
 
 # Remove the wp-settings-1 cookie
@@ -19,24 +19,21 @@ set req.http.Cookie = regsuball(req.http.Cookie, "wordpress_test_cookie=[^;]+(; 
 # The reason I don't take the wp-content/uploads is because of cache size on bigger blogs
 # that would fill up with all those files getting pushed into cache
 if (req.url ~ "wp-content/themes/" && req.url ~ "\.(css|js|png|gif|jp(e)?g)") {
-	unset req.http.cookie;
+    unset req.http.cookie;
 }
 
 # Even if no cookies are present, I don't want my "uploads" to be cached due to their potential size
 if (req.url ~ "/wp-content/uploads/") {
-	return (pass);
+    return (pass);
 }
 
 # Check the cookies for wordpress-specific items
 if (req.http.Cookie ~ "wordpress_" || req.http.Cookie ~ "comment_") {
-        # A wordpress specific cookie has been set
-	return (pass);
+    # A wordpress specific cookie has been set
+    return (pass);
 }
 
 # Anything else left?
 if (!req.http.cookie) {
-	unset req.http.cookie;
+    unset req.http.cookie;
 }
-
-# Try a cache-lookup
-return (lookup);
