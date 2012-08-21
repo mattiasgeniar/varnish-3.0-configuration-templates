@@ -1,16 +1,23 @@
 # Default backend definition.  Set this to point to your content
 # server.
 backend default {
-# I have Virtual Hosts that only listen to the Public IP
-# so no 127.0.0.1 for me
-# Backend is running on port 81
+    # I have Virtual Hosts that only listen to the Public IP
+    # so no 127.0.0.1 for me
+    # Backend is running on port 81
     .host = "127.0.0.1";
     .port = "80";
+    .probe = {
+        .url = "/";
+        .timeout  = 1s;
+        .interval = 10s;
+        .window    = 5;
+        .threshold = 2;
+    }
     .first_byte_timeout = 300s;
 }
 
 acl purge {
-# For now, I'll only allow purges coming from localhost
+    # For now, I'll only allow purges coming from localhost
     "127.0.0.1";
     "localhost";
 }
@@ -190,6 +197,13 @@ sub vcl_fetch {
         include "/etc/varnish/varnish-3.0-configuration-templates/conf.d/fetch/drupal7.vcl";
     }
 
+    # If the request to the backend returns a code other than 200, restart the loop
+    # If the number of restarts reaches the value of the parameter max_restarts,
+    # the request will be error'ed.  max_restarts defaults to 4.  This prevents
+    # an eternal loop in the event that, e.g., the object does not exist at all.
+    if (beresp.status != 200 && beresp.status != 403 && beresp.status != 404) {
+        return(restart);
+    }
     if (beresp.ttl <= 0s || beresp.http.Set-Cookie || beresp.http.Vary == "*") {
         set beresp.ttl = 120s;
         return (hit_for_pass);
@@ -220,6 +234,9 @@ sub vcl_deliver {
 }
 
 sub vcl_error {
+    if (obj.status == 503 && req.restarts < 4) {
+        return(restart);
+    }
     include "/etc/varnish/varnish-3.0-configuration-templates/conf.d/error.vcl";
     return (deliver);
 }
