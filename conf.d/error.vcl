@@ -28,96 +28,117 @@ synthetic {"
     </head>
     <body>
         <div class="container">
-            <h1 class="pagination-centered">Error "} + obj.status + " " + obj.response + {"</h1>
-            <div class="alert alert-error pagination-centered"><i class="icon-warning-sign"></i> D&eacute;sol&eacute; mais la page ne peut etre charg&eacute; correctement. <i class="icon-warning-sign"></i></div>
-            <div class="alert alert-error pagination-centered"><i class="icon-warning-sign"></i> We're very sorry, but the page could not be loaded properly. <i class="icon-warning-sign"></i></div>
-            <blockquote>Toutes nos escuses, Cela va etre fix&eacute; rapidement.<br \>
-                This should be fixed very soon, and we apologize for any inconvenience
-            </blockquote>
+            <div class="page-header">
+                <h1 class="pagination-centered">Error "} + obj.status + " " + obj.response + {"</h1>
+            </div>
+            <div class="alert alert-error pagination-centered">
+                <i class="icon-warning-sign"></i>
+                D&eacute;sol&eacute; mais la page ne peut etre charg&eacute; correctement.
+                <i class="icon-warning-sign"></i>
+            </div>
+            <div class="alert alert-error pagination-centered">
+                <i class="icon-warning-sign"></i>
+                We're very sorry, but the page could not be loaded properly.
+                <i class="icon-warning-sign"></i>
+            </div>
+            <blockquote>Toutes nos escuses, Cela va etre fix&eacute; rapidement.</blockquote>
+            <blockquote>This should be fixed very soon, and we apologize for any inconvenience.</blockquote>
 
-            <hr \>
+            <div class="accordion-heading pagination-centered">
+                <button class="btn accordion-toggle" data-toggle="collapse" href="#debug">
+                    Show debug
+                </button>
+            </div>
+            <div id="debug" class="accordion-body collapse">
+                <div class="accordion-inner">
 
-            <table class="table table-striped table-bordered table-condensed"><caption><h2 class="pagination-centered">Debug Informations</h2></caption>
-                <tr>
-                    <th>Variable</th>
-                    <th>Value</th>
-                </tr>
-                <tr>
-                    <td colspan="2">General</td>
-                </tr>
-                <tr>
-                    <td width="20%">XID</td>
-                    <td>"} + req.xid + {"</td>
-                </tr>
-                <tr>
-                    <td>Time</td>
-                    <td>"} + now + {"</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Request</td>
-                </tr>
-                <tr>
-                    <td>HTTP host</td>
-                    <td>"} + req.http.Host + {"</td>
-                </tr>
-                <tr>
-                    <td>Request type</td>
-                    <td>"} + req.request + {"</td>
-                </tr>
-                <tr>
-                    <td>HTTP Protocol version</td>
-                    <td>"} + req.proto + {"</td>
-                </tr>
-                <tr>
-                    <td>URL</td>
-                    <td>"} + req.url + {"</td>
-                </tr>
-                <tr>
-                    <td>Cookies</td>
-                    <td>"} + regsuball(req.http.cookie, "; ", "<br />") + {"</td>
-                </tr>
-                <tr>
-                    <td>Accept-Encoding</td>
-                    <td>"} + req.http.Accept-Encoding + {"</td>
-                </tr>
-                <tr>
-                    <td>Cache-Control</td>
-                    <td>"} + req.http.Cache-Control + {"</td>
-                </tr>
-                <tr>
-                    <td>HTTP header</td>
-                    <td>"} + req.http.header + {"</td>
-                </tr>
-                <tr>
-                    <td>GZIP supported</td>
-                    <td>"} + req.can_gzip + {"</td>
-                </tr>
-                <tr>
-                    <td>Backend</td>
-                    <td>"} + req.backend + {"</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Server</td>
-                </tr>
-                <tr>
-                    <td>Identity</td>
-                    <td>"} + server.identity + {"</td>
-                </tr>
-                <tr>
-                    <td>IP:port</td>
-                    <td>"} + server.ip + {":"} + server.port + {"</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Client</td>
-                </tr>
-                <tr>
-                    <td>IP</td>
-                    <td>"} + client.ip + {"</td>
-                </tr>
-            </table>
+
+
+                    <table class="table table-striped table-bordered table-condensed"><caption><h2 class="pagination-centered">Debug Informations</h2></caption>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr>
+                            <td colspan="2">General</td>
+                        </tr>
+                        <tr>
+                            <td width="20%">XID</td>
+                            <td>"} + req.xid + {"</td>
+                        </tr>
+                        <tr>
+                            <td>Time</td>
+                            <td>"} + now + {"</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Request</td>
+                        </tr>
+                        <tr>
+                            <td>HTTP host</td>
+                            <td>"} + req.http.Host + {"</td>
+                        </tr>
+                        <tr>
+                            <td>Request type</td>
+                            <td>"} + req.request + {"</td>
+                        </tr>
+                        <tr>
+                            <td>HTTP Protocol version</td>
+                            <td>"} + req.proto + {"</td>
+                        </tr>
+                        <tr>
+                            <td>URL</td>
+                            <td>"} + req.url + {"</td>
+                        </tr>
+                        <tr>
+                            <td>Cookies</td>
+                            <td>"} + regsuball(req.http.cookie, "; ", "<br />") + {"</td>
+                        </tr>
+                        <tr>
+                            <td>Accept-Encoding</td>
+                            <td>"} + req.http.Accept-Encoding + {"</td>
+                        </tr>
+                        <tr>
+                            <td>Cache-Control</td>
+                            <td>"} + req.http.Cache-Control + {"</td>
+                        </tr>
+                        <tr>
+                            <td>HTTP header</td>
+                            <td>"} + req.http.header + {"</td>
+                        </tr>
+                        <tr>
+                            <td>GZIP supported</td>
+                            <td>"} + req.can_gzip + {"</td>
+                        </tr>
+                        <tr>
+                            <td>Backend</td>
+                            <td>"} + req.backend + {"</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Server</td>
+                        </tr>
+                        <tr>
+                            <td>Identity</td>
+                            <td>"} + server.identity + {"</td>
+                        </tr>
+                        <tr>
+                            <td>IP:port</td>
+                            <td>"} + server.ip + {":"} + server.port + {"</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Client</td>
+                        </tr>
+                        <tr>
+                            <td>IP</td>
+                            <td>"} + client.ip + {"</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
         <footer class="container pagination-centered">
         </footer>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/js/bootstrap.min.js"></script>
     </body>
 </html>
 "};
