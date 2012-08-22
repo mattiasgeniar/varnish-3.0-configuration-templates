@@ -201,7 +201,7 @@ sub vcl_fetch {
     # If the number of restarts reaches the value of the parameter max_restarts,
     # the request will be error'ed.  max_restarts defaults to 4.  This prevents
     # an eternal loop in the event that, e.g., the object does not exist at all.
-    if (beresp.status != 200 && beresp.status != 403 && beresp.status != 404 && beresp.status !=302 && beresp.status !=301) {
+    if (beresp.status == 500 || beresp.status == 502){
         return(restart);
     }
     if (beresp.ttl <= 0s || beresp.http.Set-Cookie || beresp.http.Vary == "*") {
