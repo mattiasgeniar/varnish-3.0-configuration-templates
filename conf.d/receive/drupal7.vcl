@@ -23,3 +23,6 @@ if (req.url ~ "install\.php|update\.php|cron\.php") {
 if (!req.http.cookie) {
     unset req.http.cookie;
 }
+
+# Try a cache-lookup
+return (lookup);

@@ -2,8 +2,8 @@
 
 # Either the admin pages or the login
 if (req.url ~ "(private|backend)") {
-        # Don't cache, pass to backend
-        return (pass);
+    # Don't cache, pass to backend
+    return (pass);
 }
 
 # Someone placed comments on the site, there are still cookies left
@@ -18,5 +18,8 @@ set req.http.Cookie = regsuball(req.http.Cookie, "PHPSESSID=[^;]+(; )?", "");
 
 # Anything else left?
 if (!req.http.cookie) {
-        unset req.http.cookie;
+    unset req.http.cookie;
 }
+
+# Try a cache-lookup
+return (lookup);

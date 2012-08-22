@@ -37,3 +37,6 @@ if (req.http.Cookie ~ "wordpress_" || req.http.Cookie ~ "comment_") {
 if (!req.http.cookie) {
     unset req.http.cookie;
 }
+
+# Try a cache-lookup
+return (lookup);
