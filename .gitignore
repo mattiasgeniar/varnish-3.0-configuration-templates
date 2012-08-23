@@ -1,2 +1,4 @@
 # Ignore these files
 secret
+custom.fetch.vcl
+custom.recv.vcl

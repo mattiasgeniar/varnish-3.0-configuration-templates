@@ -115,14 +115,7 @@ sub vcl_recv {
         }
     }
 
-    # Include the correct Virtual Host configuration file
-    if (req.http.Host == "my-wp1.localhost" || req.http.Host == "my-wp2.localhost") {
-        # The Wordpress specific receive
-        include "/etc/varnish/varnish-3.0-configuration-templates/conf.d/receive/wordpress.vcl";
-    } elsif (req.http.Host == "my-drupal1.localhost" || req.http.Host == "my-drupal2.localhost") {
-        # The Drupal 7 specific receive
-        include "/etc/varnish/varnish-3.0-configuration-templates/conf.d/receive/drupal7.vcl";
-    }
+        include "/usr/local/etc/varnish/custom.recv.vcl";
 
     if (req.http.Authorization || req.http.Cookie) {
         # Not cacheable by default
@@ -188,14 +181,7 @@ sub vcl_miss {
 
 # Handle the HTTP request coming from our backend 
 sub vcl_fetch {
-    # I can use direct matching on the host, since I normalized the host header in the VCL Receive
-    if (req.http.Host == "my-wp1.localhost" || req.http.Host == "my-wp2.localhost") {
-        # Since this is a Wordpress setup, the Wordpress-specific Fetch
-        include "/etc/varnish/varnish-3.0-configuration-templates/conf.d/fetch/wordpress.vcl";
-    } elsif (req.http.Host == "my-drupal1.localhost" || req.http.Host == "my-drupal2.localhost") {
-        # Include the Drupal 7 specific VCL
-        include "/etc/varnish/varnish-3.0-configuration-templates/conf.d/fetch/drupal7.vcl";
-    }
+    include "/usr/local/etc/varnish/custom.fetch.vcl";
 
     # If the request to the backend returns a code other than 200, restart the loop
     # If the number of restarts reaches the value of the parameter max_restarts,
@@ -237,7 +223,7 @@ sub vcl_error {
     if (obj.status == 503 && req.restarts < 4) {
         return(restart);
     }
-    include "/etc/varnish/varnish-3.0-configuration-templates/conf.d/error.vcl";
+    include "/usr/local/etc/varnish/conf.d/error.vcl";
     return (deliver);
 }
 
