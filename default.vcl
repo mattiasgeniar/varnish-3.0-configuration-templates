@@ -115,7 +115,12 @@ sub vcl_recv {
         }
     }
 
-        include "/usr/local/etc/varnish/custom.recv.vcl";
+    # Remove all cookies for static files
+    if (req.url ~ "\.(less|jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|js|flv|swf)$") {
+        unset req.http.Cookie;
+        return (lookup);
+    }
+    include "/usr/local/etc/varnish/custom.recv.vcl";
 
     if (req.http.Authorization || req.http.Cookie) {
         # Not cacheable by default
@@ -190,6 +195,13 @@ sub vcl_fetch {
     if (beresp.status == 500 || beresp.status == 502){
         return(restart);
     }
+
+    # Enable cache for all static files
+    if (req.url ~ "\.(jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|js|flv|swf)$") {
+        unset beresp.http.set-cookie;
+    }
+
+    # Set 2min cache if unset for static files
     if (beresp.ttl <= 0s || beresp.http.Set-Cookie || beresp.http.Vary == "*") {
         set beresp.ttl = 120s;
         return (hit_for_pass);
