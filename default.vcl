@@ -223,7 +223,7 @@ sub vcl_deliver {
     unset resp.http.X-Powered-By;
     # Remove some headers: Apache version & OS
     unset resp.http.Server;
-
+    unset resp.http.X-Drupal-Cache;
     unset resp.http.X-Varnish;
     unset resp.http.Via;
     unset resp.http.Link;
