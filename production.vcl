@@ -160,6 +160,9 @@ sub vcl_hash {
     if (req.http.Cookie) {
         hash_data(req.http.Cookie);
     }
+    if (req.http.Authorization) {
+        hash_data(req.http.Authorization);
+    }
 
     # If the client supports compression, keep that in a different cache
     if (req.http.Accept-Encoding) {
