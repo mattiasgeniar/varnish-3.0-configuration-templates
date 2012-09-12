@@ -1,8 +1,8 @@
 # Include the correct Virtual Host configuration file
 if (req.http.Host == "my-wp1.localhost" || req.http.Host == "my-wp2.localhost") {
     # The Wordpress specific receive
-    include "/etc/varnish/varnish-3.0-configuration-templates/conf.d/receive/wordpress.vcl";
+    include "/usr/local/etc/varnish/conf.d/receive/wordpress.vcl";
 } elsif (req.http.Host == "my-drupal1.localhost" || req.http.Host == "my-drupal2.localhost") {
     # The Drupal 7 specific receive
-    include "/etc/varnish/varnish-3.0-configuration-templates/conf.d/receive/drupal7.vcl";
+    include "/usr/local/etc/varnish/conf.d/receive/drupal7.vcl";
 }
