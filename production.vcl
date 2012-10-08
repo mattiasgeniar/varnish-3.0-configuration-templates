@@ -1,23 +1,11 @@
 # Default backend definition.  Set this to point to your content
 # server.
-backend default {
-    # I have Virtual Hosts that only listen to the Public IP
-    # so no 127.0.0.1 for me
-    # Backend is running on port 81
-    .host = "127.0.0.1";
-    .port = "80";
-    .probe = {
-        .url = "/ping";
-        .timeout  = 1s;
-        .interval = 10s;
-        .window    = 5;
-        .threshold = 2;
-    }
-    .first_byte_timeout = 300s;
-}
+
+include "/usr/local/etc/varnish/custom.backend.vcl";
 
 acl purge {
     # For now, I'll only allow purges coming from localhost
+    "176.31.254.120";
     "127.0.0.1";
     "localhost";
 }

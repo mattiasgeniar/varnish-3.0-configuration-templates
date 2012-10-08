@@ -1,0 +1,15 @@
+backend default {
+    # I have Virtual Hosts that only listen to the Public IP
+    # so no 127.0.0.1 for me
+    # Backend is running on port 81
+    .host = "127.0.0.1";
+    .port = "80";
+    .probe = {
+        .url = "/ping";
+        .timeout  = 1s;
+        .interval = 10s;
+        .window    = 5;
+        .threshold = 2;
+    }
+    .first_byte_timeout = 300s;
+}
