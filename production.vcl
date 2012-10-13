@@ -2,13 +2,7 @@
 # server.
 
 include "/usr/local/etc/varnish/custom.backend.vcl";
-
-acl purge {
-    # For now, I'll only allow purges coming from localhost
-    "176.31.254.120";
-    "127.0.0.1";
-    "localhost";
-}
+include "/usr/local/etc/varnish/custom.acl.vcl";
 
 # Handle the HTTP request received by the client 
 sub vcl_recv {
@@ -230,8 +224,11 @@ sub vcl_deliver {
 sub vcl_error {
     if (obj.status == 503 && req.restarts < 4) {
         return(restart);
+    } elsif (obj.status == 200 ) {
+        # :)
+    } else {
+        include "/usr/local/etc/varnish/conf.d/error.vcl";
     }
-    include "/usr/local/etc/varnish/conf.d/error.vcl";
     return (deliver);
 }
 

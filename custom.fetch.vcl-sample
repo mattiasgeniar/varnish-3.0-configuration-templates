@@ -1,5 +1,5 @@
 # stream big file, add missing extention below
-if (req.url ~ "(avi|dmg|mkv|zip)$") {
+if (req.url ~ "\.(avi|iso|img|dmg|mkv|zip)$") {
     set beresp.do_stream = true;
     set beresp.ttl = 1h;
 }
