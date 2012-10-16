@@ -1,5 +1,5 @@
 Installation
-- Replace /etc/varnish/varnish-3.0-configuration-templates with your correct path into default.vcl
+- Replace /usr/local/etc/varnish/varnish-3.0-configuration-templates with your correct path into production.vcl
 
 A set of configuration samples used for Varnish 3.0. This includes templates for:
 - Wordpress
