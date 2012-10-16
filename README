@@ -1,8 +1,12 @@
+Installation
+- Replace /etc/varnish/varnish-3.0-configuration-templates with your correct path into default.vcl
+
 A set of configuration samples used for Varnish 3.0. This includes templates for:
 - Wordpress
 - Drupal (works decently for Drupal 7, depends on your addons obviously)
 - Joomla (WIP)
 - Fork CMS (works decently enough)
+- OpenPhoto
 
 And various configuration for:
 - Server-side URL rewriting
