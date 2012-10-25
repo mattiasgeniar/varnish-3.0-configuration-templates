@@ -175,7 +175,7 @@ sub vcl_miss {
 
 # Handle the HTTP request coming from our backend 
 sub vcl_fetch {
-    include "/usr/local/etc/varnish/custom.fetch.vcl";
+    include "/etc/varnish/custom.fetch.vcl";
 
     # If the request to the backend returns a code other than 200, restart the loop
     # If the number of restarts reaches the value of the parameter max_restarts,
