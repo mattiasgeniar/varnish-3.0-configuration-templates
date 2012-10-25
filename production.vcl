@@ -1,8 +1,7 @@
-# Default backend definition.  Set this to point to your content
-# server.
+# Default backend definition.  Set this to point to your content server.
 
-include "/usr/local/etc/varnish/custom.backend.vcl";
-include "/usr/local/etc/varnish/custom.acl.vcl";
+include "/etc/varnish/custom.backend.vcl";
+include "/etc/varnish/custom.acl.vcl";
 
 # Handle the HTTP request received by the client 
 sub vcl_recv {
@@ -48,7 +47,7 @@ sub vcl_recv {
 
     # Some generic URL manipulation, useful for all templates that follow
     # First remove the Google Analytics added parameters, useless for our backend
-    if(req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
+    if (req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
         set req.url = regsuball(req.url, "&(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "");
         set req.url = regsuball(req.url, "\?(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "?");
         set req.url = regsub(req.url, "\?&", "?");
@@ -102,7 +101,7 @@ sub vcl_recv {
         unset req.http.Cookie;
         return (lookup);
     }
-    include "/usr/local/etc/varnish/custom.recv.vcl";
+    include "/etc/varnish/custom.recv.vcl";
 
     if (req.http.Authorization || req.http.Cookie) {
         # Not cacheable by default
@@ -227,7 +226,7 @@ sub vcl_error {
     } elsif (obj.status == 200 ) {
         # :)
     } else {
-        include "/usr/local/etc/varnish/conf.d/error.vcl";
+        include "/etc/varnish/conf.d/error.vcl";
     }
     return (deliver);
 }
