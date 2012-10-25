@@ -33,15 +33,10 @@ synthetic {"
             </div>
             <div class="alert alert-error pagination-centered">
                 <i class="icon-warning-sign"></i>
-                D&eacute;sol&eacute; mais la page ne peut etre charg&eacute; correctement.
-                <i class="icon-warning-sign"></i>
-            </div>
-            <div class="alert alert-error pagination-centered">
-                <i class="icon-warning-sign"></i>
                 We're very sorry, but the page could not be loaded properly.
                 <i class="icon-warning-sign"></i>
             </div>
-            <blockquote>Toutes nos escuses, Cela va etre fix&eacute; rapidement.</blockquote>
+
             <blockquote>This should be fixed very soon, and we apologize for any inconvenience.</blockquote>
 
             <div class="accordion-heading pagination-centered">
@@ -54,7 +49,7 @@ synthetic {"
 
 
 
-                    <table class="table table-striped table-bordered table-condensed"><caption><h2 class="pagination-centered">Debug Informations</h2></caption>
+                    <table class="table table-striped table-bordered table-condensed"><caption><h2 class="pagination-centered">Debug Information</h2></caption>
                         <tr>
                             <th>Variable</th>
                             <th>Value</th>
