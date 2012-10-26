@@ -1,7 +1,7 @@
 # stream big file, add missing extention below
-if (req.url ~ "\.(avi|iso|img|dmg|mkv|zip)$") {
+if (req.url ~ "\.(avi|deb|tar|gz|rar|iso|img|dmg|mkv|zip)$") {
     set beresp.do_stream = true;
-    set beresp.ttl = 1h;
+    set beresp.ttl = 1d;
 }
 if (req.http.Host == "my-wp1.localhost" || req.http.Host == "my-wp2.localhost") {
     # Since this is a Wordpress setup, the Wordpress-specific Fetch
