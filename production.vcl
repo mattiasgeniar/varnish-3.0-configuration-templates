@@ -224,9 +224,7 @@ sub vcl_deliver {
 sub vcl_error {
     if (obj.status == 503 && req.restarts < 4) {
         return(restart);
-    } elsif (obj.status == 200 ) {
-        # :)
-    } else {
+    } elsif (obj.status != 200 ) {
         include "conf.d/error.vcl";
     }
     return (deliver);
