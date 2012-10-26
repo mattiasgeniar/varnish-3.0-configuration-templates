@@ -1,7 +1,8 @@
 # Default backend definition.  Set this to point to your content server.
+# all paths relative to varnish option vcl_dir
 
-include "/etc/varnish/custom.backend.vcl";
-include "/etc/varnish/custom.acl.vcl";
+include "custom.backend.vcl";
+include "custom.acl.vcl";
 
 # Handle the HTTP request received by the client 
 sub vcl_recv {
@@ -101,7 +102,7 @@ sub vcl_recv {
         unset req.http.Cookie;
         return (lookup);
     }
-    include "/etc/varnish/custom.recv.vcl";
+    include "custom.recv.vcl";
 
     if (req.http.Authorization || req.http.Cookie) {
         # Not cacheable by default
@@ -175,7 +176,7 @@ sub vcl_miss {
 
 # Handle the HTTP request coming from our backend 
 sub vcl_fetch {
-    include "/etc/varnish/custom.fetch.vcl";
+    include "custom.fetch.vcl";
 
     # If the request to the backend returns a code other than 200, restart the loop
     # If the number of restarts reaches the value of the parameter max_restarts,
@@ -226,7 +227,7 @@ sub vcl_error {
     } elsif (obj.status == 200 ) {
         # :)
     } else {
-        include "/etc/varnish/conf.d/error.vcl";
+        include "conf.d/error.vcl";
     }
     return (deliver);
 }
