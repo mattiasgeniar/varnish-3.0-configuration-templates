@@ -6,6 +6,10 @@ include "custom.acl.vcl";
 
 # Handle the HTTP request received by the client 
 sub vcl_recv {
+    # shortcut for DFind requests
+    if (req.url ~ "^/w00tw00t") {
+        error 404 "Not Found";
+    }
     if (req.restarts == 0) {
         if (req.http.X-Forwarded-For) {
             set req.http.X-Forwarded-For = req.http.X-Forwarded-For + ", " + client.ip;
@@ -98,7 +102,7 @@ sub vcl_recv {
     }
 
     # Remove all cookies for static files
-    if (req.url ~ "\.(less|jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|js|flv|swf)$") {
+    if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|mp[34]|pdf|png|rar|rtf|swf|tar|tgz|txt|wav|woff|xml|zip)(\?.*)?$") {
         unset req.http.Cookie;
         return (lookup);
     }
@@ -187,7 +191,7 @@ sub vcl_fetch {
     }
 
     # Enable cache for all static files
-    if (req.url ~ "\.(jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|js|flv|swf)$") {
+    if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|mp[34]|pdf|png|rar|rtf|swf|tar|tgz|txt|wav|woff|xml|zip)(\?.*)?$") {
         unset beresp.http.set-cookie;
     }
 
