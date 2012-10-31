@@ -6,6 +6,10 @@ include "custom.acl.vcl";
 
 # Handle the HTTP request received by the client 
 sub vcl_recv {
+    # shortcut for DFind requests
+    if (req.url ~ "^/w00tw00t") {
+        error 404 "Not Found";
+    }
     if (req.restarts == 0) {
         if (req.http.X-Forwarded-For) {
             set req.http.X-Forwarded-For = req.http.X-Forwarded-For + ", " + client.ip;
@@ -98,7 +102,7 @@ sub vcl_recv {
     }
 
     # Remove all cookies for static files
-    if (req.url ~ "\.(less|jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|js|flv|swf)$") {
+    if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|mp[34]|pdf|png|rar|rtf|swf|tar|tgz|txt|wav|woff|xml|zip)(\?.*)?$") {
         unset req.http.Cookie;
         return (lookup);
     }
@@ -158,7 +162,7 @@ sub vcl_hit {
     # Allow purges
     if (req.request == "PURGE") {
         purge;
-        error 200 "Purged.";
+        error 200 "purged";
     }
 
     return (deliver);
@@ -168,7 +172,7 @@ sub vcl_miss {
     # Allow purges
     if (req.request == "PURGE") {
         purge;
-        error 200 "URL Purged.";
+        error 200 "purged";
     }
 
     return (fetch);
@@ -178,16 +182,16 @@ sub vcl_miss {
 sub vcl_fetch {
     include "custom.fetch.vcl";
 
-    # If the request to the backend returns a code other than 200, restart the loop
+    # If the request to the backend returns a code is 5xx, restart the loop
     # If the number of restarts reaches the value of the parameter max_restarts,
     # the request will be error'ed.  max_restarts defaults to 4.  This prevents
     # an eternal loop in the event that, e.g., the object does not exist at all.
-    if (beresp.status == 500 || beresp.status == 502){
+    if (beresp.status >= 500 && beresp.status <= 599){
         return(restart);
     }
 
     # Enable cache for all static files
-    if (req.url ~ "\.(jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|js|flv|swf)$") {
+    if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|mp[34]|pdf|png|rar|rtf|swf|tar|tgz|txt|wav|woff|xml|zip)(\?.*)?$") {
         unset beresp.http.set-cookie;
     }
 
@@ -203,7 +207,7 @@ sub vcl_fetch {
 # The routine when we deliver the HTTP request to the user
 # Last chance to modify headers that are sent to the client
 sub vcl_deliver {
-    if (obj.hits > 0) { 
+    if (obj.hits > 0) {
         set resp.http.X-Cache = "cached";
     } else {
         set resp.http.x-Cache = "uncached";
@@ -222,11 +226,14 @@ sub vcl_deliver {
 }
 
 sub vcl_error {
-    if (obj.status == 503 && req.restarts < 4) {
+    if (obj.status >= 500 && obj.status <= 599 && req.restarts < 4) {
+        # 4 retry for 5xx error
         return(restart);
-    } elsif (obj.status == 200 ) {
-        # :)
-    } else {
+    } elsif (obj.status >= 400 && obj.status <= 499 ) {
+        # use 404 error page for 4xx error
+        include "conf.d/error-404.vcl";
+    } elsif (obj.status <= 200 && obj.status >= 299 ) {
+        # for other errors (not 5xx, not 4xx and not 2xx)
         include "conf.d/error.vcl";
     }
     return (deliver);
