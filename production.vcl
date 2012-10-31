@@ -162,7 +162,7 @@ sub vcl_hit {
     # Allow purges
     if (req.request == "PURGE") {
         purge;
-        error 200 "Purged.";
+        error 200 "purged";
     }
 
     return (deliver);
@@ -172,7 +172,7 @@ sub vcl_miss {
     # Allow purges
     if (req.request == "PURGE") {
         purge;
-        error 200 "URL Purged.";
+        error 200 "purged";
     }
 
     return (fetch);
@@ -182,11 +182,11 @@ sub vcl_miss {
 sub vcl_fetch {
     include "custom.fetch.vcl";
 
-    # If the request to the backend returns a code other than 200, restart the loop
+    # If the request to the backend returns a code is 5xx, restart the loop
     # If the number of restarts reaches the value of the parameter max_restarts,
     # the request will be error'ed.  max_restarts defaults to 4.  This prevents
     # an eternal loop in the event that, e.g., the object does not exist at all.
-    if (beresp.status == 500 || beresp.status == 502){
+    if (beresp.status >= 500 && beresp.status <= 599){
         return(restart);
     }
 
@@ -207,7 +207,7 @@ sub vcl_fetch {
 # The routine when we deliver the HTTP request to the user
 # Last chance to modify headers that are sent to the client
 sub vcl_deliver {
-    if (obj.hits > 0) { 
+    if (obj.hits > 0) {
         set resp.http.X-Cache = "cached";
     } else {
         set resp.http.x-Cache = "uncached";
