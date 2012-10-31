@@ -1,4 +1,4 @@
-### Varnish Configuration Templates (boilerplate)
+## Varnish Configuration Templates (boilerplate)
 
 ### Installation
 You can use the configuration templates found in this repository to quickly get started with a complete Varnish configuration that offers support for most functionality.
