@@ -106,6 +106,11 @@ sub vcl_recv {
         unset req.http.Cookie;
         return (lookup);
     }
+
+    # Send Surrogate-Capability headers to announce ESI support to backend
+    set req.http.Surrogate-Capability = "key=ESI/1.0";
+
+    # Include custom vcl_recv logic
     include "custom.recv.vcl";
 
     if (req.http.Authorization || req.http.Cookie) {
@@ -180,7 +185,14 @@ sub vcl_miss {
 
 # Handle the HTTP request coming from our backend 
 sub vcl_fetch {
+    # Include custom vcl_fetch logic
     include "custom.fetch.vcl";
+
+    # Parse ESI request and remove Surrogate-Control header
+    if (beresp.http.Surrogate-Control ~ "ESI/1.0") {
+        unset beresp.http.Surrogate-Control;
+        set beresp.do_esi = true;
+    }
 
     # If the request to the backend returns a code is 5xx, restart the loop
     # If the number of restarts reaches the value of the parameter max_restarts,
