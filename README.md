@@ -17,3 +17,12 @@ And various configuration for:
 * Virtual Host implementations
 * Various header normalizations
 * Cookie manipulations
+
+## Contributors
+Ordered by date of first contribution.
+[Auto-generated](http://github.com/dtrejo/node-authors) on Wed Nov 07 2012 16:57:35 GMT+0100 (CET).
+
+- [Mattias Geniar aka `mattiasgeniar`](https://github.com/mattiasgeniar)
+- [root aka `root`](https://github.com/root)
+- [pad92 aka `pad92`](https://github.com/pad92)
+- [Thijs Feryn aka `ThijsFeryn`](https://github.com/ThijsFeryn)
