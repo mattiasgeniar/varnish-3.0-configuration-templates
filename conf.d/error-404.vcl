@@ -14,7 +14,7 @@ synthetic {"
         <meta name="generator" content="vim">
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
         <!-- Le styles -->
-        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.0/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
         <style>
             body {
                 padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
@@ -31,7 +31,7 @@ synthetic {"
                 <h1 class="pagination-centered">Error "} + obj.status + " " + obj.response + {"</h1>
             </div>
         </div>
-        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.0/js/bootstrap.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
     </body>
 </html>
 "};

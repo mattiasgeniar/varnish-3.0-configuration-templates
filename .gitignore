@@ -1,4 +1,5 @@
 # Ignore these files
+.gitconfig
 secret
 default.vcl
 custom.acl.vcl
