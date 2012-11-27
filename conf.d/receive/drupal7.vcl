@@ -7,6 +7,7 @@ if (req.url ~ "/admin/?") {
 }
 
 # Static content unique to the theme can be cached (so no user uploaded images)
+# Before you blindly enable this, have a read here: http://mattiasgeniar.be/2012/11/28/stop-caching-static-files/
 if (req.url ~ "^/themes/" && req.url ~ "\.(css|js|png|gif|jp(e)?g)") {
     unset req.http.cookie;
 }
