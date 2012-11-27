@@ -105,6 +105,8 @@ sub vcl_recv {
     }
 
     # Remove all cookies for static files
+    # A valid discussion could be held on this line: do you really need to cache static files that don't cause load? Only if you have memory left.
+    # Sure, there's disk I/O, but chances are your OS will already have these files in their buffers (thus memory).
     if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|mp[34]|pdf|png|rar|rtf|swf|tar|tgz|txt|wav|woff|xml|zip)(\?.*)?$") {
         unset req.http.Cookie;
         return (lookup);
@@ -206,6 +208,7 @@ sub vcl_fetch {
     }
 
     # Enable cache for all static files
+    # The same argument as the static caches from above: monitor your cache size, if you get data nuked out of it, consider giving up the static file cache.
     if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|mp[34]|pdf|png|rar|rtf|swf|tar|tgz|txt|wav|woff|xml|zip)(\?.*)?$") {
         unset beresp.http.set-cookie;
     }
