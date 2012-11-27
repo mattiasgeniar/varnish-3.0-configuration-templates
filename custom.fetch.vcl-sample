@@ -6,6 +6,9 @@ if (req.url ~ "\.(avi|deb|tar|gz|rar|iso|img|dmg|mkv|zip)$") {
 if (req.http.Host == "my-wp1.localhost" || req.http.Host == "my-wp2.localhost") {
     # Since this is a Wordpress setup, the Wordpress-specific Fetch
     include "conf.d/fetch/wordpress.vcl";
+} elsif (req.http.Host == "my-formcms1.localhost" || req.http.Host == "my-forkcms2.localhost") {
+    # Include the FormCMS specific VCL
+    include "conf.d/fetch/forkcms.vcl";
 } elsif (req.http.Host == "my-drupal1.localhost" || req.http.Host == "my-drupal2.localhost") {
     # Include the Drupal 7 specific VCL
     include "conf.d/fetch/drupal7.vcl";
