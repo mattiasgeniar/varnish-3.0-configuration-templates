@@ -70,6 +70,21 @@ sub vcl_recv {
         set req.url = regsub(req.url, "\?$", "");
     }
 
+    # This is an example to redirect with a 301/302 HTTP status code from within Varnish
+    # if (req.http.Host ~ "secure.mysite.tld") {
+    #   # We may want to force our users from the secure site to the HTTPs version?
+    #   error 720 "https://secure.mysite.tld";
+    #   # If you want to keep the URLs intact, this also works:
+    #   error 720 "https://" + req.http.Host + req.url;
+    # }
+    #
+    # Or to force a 302 temporary redirect, use error 721
+    # if (req.http.Host ~ "temp.mysite.tld") {
+    #   # Temporary redirect
+    #   error 721 "http://mysite.tld/temp";
+    # }
+    #
+
     # Some generic cookie manipulation, useful for all templates that follow
     # Remove the "has_js" cookie
     set req.http.Cookie = regsuball(req.http.Cookie, "has_js=[^;]+(; )?", "");
@@ -266,9 +281,22 @@ sub vcl_error {
     } elsif (obj.status <= 200 && obj.status >= 299 ) {
         # for other errors (not 5xx, not 4xx and not 2xx)
         include "conf.d/error.vcl";
+    } elseif (obj.status == 720) {
+        # We use this special error status 720 to force redirects with 301 (permanent) redirects
+        # To use this, call the following from anywhere in vcl_recv: error 720 "http://host/new.html"
+        set obj.status = 301;
+        set obj.http.Location = obj.response;
+        return (deliver);
+    } elseif (obj.status == 721) {
+        # And we use error status 721 to force redirects with a 302 (temporary) redirect
+        # To use this, call the following from anywhere in vcl_recv: error 720 "http://host/new.html"
+        set obj.status = 302;
+        set obj.http.Location = obj.response;
+        return (deliver);
     } else {
         include "conf.d/error.vcl";
     }
+
     return (deliver);
 }
 
