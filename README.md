@@ -8,7 +8,7 @@ A set of configuration samples used for Varnish 3.0. This includes templates for
 * Wordpress
 * Drupal (works decently for Drupal 7, depends on your addons obviously)
 * Joomla (WIP)
-* Fork CMS (works decently enough)
+* Fork CMS
 * OpenPhoto
 
 And various configuration for:
@@ -17,6 +17,7 @@ And various configuration for:
 * Virtual Host implementations
 * Various header normalizations
 * Cookie manipulations
+* 301/302 redirects from within Varnish
 
 ## Contributors
 Ordered by date of first contribution.
