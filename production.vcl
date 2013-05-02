@@ -99,6 +99,9 @@ sub vcl_recv {
     # Remove the Quant Capital cookies (added by some plugin, all __qca)
     set req.http.Cookie = regsuball(req.http.Cookie, "__qc.=[^;]+(; )?", "");
 
+    # Remove the AddThis cookies
+    set req.http.Cookie = regsuball(req.http.Cookie, "__atuvc=[^;]+(; )?", "");
+
     # Are there cookies left with only spaces or that are empty?
     if (req.http.cookie ~ "^ *$") {
         unset req.http.cookie;
