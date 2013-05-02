@@ -102,8 +102,11 @@ sub vcl_recv {
     # Remove the AddThis cookies
     set req.http.Cookie = regsuball(req.http.Cookie, "__atuvc=[^;]+(; )?", "");
 
+    # Remove a ";" prefix in the cookie if present
+    set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
+
     # Are there cookies left with only spaces or that are empty?
-    if (req.http.cookie ~ "^ *$") {
+    if (req.http.cookie ~ "^\s*$") {
         unset req.http.cookie;
     }
 
