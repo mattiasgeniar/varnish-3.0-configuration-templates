@@ -11,7 +11,9 @@ backend default {
         .window    = 5;
         .threshold = 2;
     }
-    .first_byte_timeout = 300s;
+    .first_byte_timeout     = 300s;   # How long to wait before we receive a first byte from our backend?
+    .connect_timeout        = 5s;     # How long to wait for a backend connection?
+    .between_bytes_timeout  = 2s;     # How long to wait between bytes received from our backend?
 }
 
 # Below is an example redirector based on the Client IP (same returning class C subnet IP will get
