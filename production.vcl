@@ -184,11 +184,6 @@ sub vcl_hash {
         hash_data(req.http.Authorization);
     }
 
-    # If the client supports compression, keep that in a different cache
-    if (req.http.Accept-Encoding) {
-        hash_data(req.http.Accept-Encoding);
-    }
-
     return (hash);
 }
 
