@@ -139,13 +139,13 @@ sub vcl_recv {
     # Send Surrogate-Capability headers to announce ESI support to backend
     set req.http.Surrogate-Capability = "key=ESI/1.0";
 
-    # Include custom vcl_recv logic
-    include "custom.recv.vcl";
-
     if (req.http.Authorization) {
         # Not cacheable by default
         return (pass);
     }
+
+    # Include custom vcl_recv logic
+    include "custom.recv.vcl";
 
     return (lookup);
 }
