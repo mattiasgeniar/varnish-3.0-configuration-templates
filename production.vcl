@@ -4,7 +4,7 @@
 include "custom.backend.vcl";
 include "custom.acl.vcl";
 
-# Handle the HTTP request received by the client 
+# Handle the HTTP request received by the client
 sub vcl_recv {
     # shortcut for DFind requests
     if (req.url ~ "^/w00tw00t") {
@@ -45,11 +45,6 @@ sub vcl_recv {
             req.request != "DELETE") {
         /* Non-RFC2616 or CONNECT which is weird. */
         return (pipe);
-    }
-
-    if (req.request != "GET" && req.request != "HEAD") {
-        # We only deal with GET and HEAD by default
-        return (pass);
     }
 
     # Some generic URL manipulation, useful for all templates that follow
@@ -127,11 +122,19 @@ sub vcl_recv {
         }
     }
 
+    # Large static files should be piped, so they are delivered directly to the end-user without
+    # waiting for Varnish to fully read the file first.
+    # TODO: once the Varnish Streaming branch merges with the master branch, use streaming here to avoid locking.
+    if (req.url ~ "^[^?]*\.(mp[34]|rar|tar|tgz|gz|wav|zip)(\?.*)?$") {
+        unset req.http.Cookie;
+        return (pipe);
+    }
+
     # Remove all cookies for static files
     # A valid discussion could be held on this line: do you really need to cache static files that don't cause load? Only if you have memory left.
     # Sure, there's disk I/O, but chances are your OS will already have these files in their buffers (thus memory).
     # Before you blindly enable this, have a read here: http://mattiasgeniar.be/2012/11/28/stop-caching-static-files/
-    if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|mp[34]|pdf|png|rar|rtf|swf|tar|tgz|txt|wav|woff|xml|zip)(\?.*)?$") {
+    if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|pdf|png|rtf|swf|txt|woff|xml)(\?.*)?$") {
         unset req.http.Cookie;
         return (lookup);
     }
@@ -204,7 +207,7 @@ sub vcl_miss {
     return (fetch);
 }
 
-# Handle the HTTP request coming from our backend 
+# Handle the HTTP request coming from our backend
 sub vcl_fetch {
     # Include custom vcl_fetch logic
     include "custom.fetch.vcl";
