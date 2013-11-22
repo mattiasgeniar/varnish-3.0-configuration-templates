@@ -142,13 +142,13 @@ sub vcl_recv {
     # Send Surrogate-Capability headers to announce ESI support to backend
     set req.http.Surrogate-Capability = "key=ESI/1.0";
 
-    # Include custom vcl_recv logic
-    include "custom.recv.vcl";
-
     if (req.http.Authorization) {
         # Not cacheable by default
         return (pass);
     }
+
+    # Include custom vcl_recv logic
+    include "custom.recv.vcl";
 
     return (lookup);
 }
@@ -281,9 +281,6 @@ sub vcl_error {
     } elsif (obj.status >= 400 && obj.status <= 499 ) {
         # use 404 error page for 4xx error
         include "conf.d/error-404.vcl";
-    } elsif (obj.status <= 200 && obj.status >= 299 ) {
-        # for other errors (not 5xx, not 4xx and not 2xx)
-        include "conf.d/error.vcl";
     } elseif (obj.status == 720) {
         # We use this special error status 720 to force redirects with 301 (permanent) redirects
         # To use this, call the following from anywhere in vcl_recv: error 720 "http://host/new.html"
@@ -297,6 +294,7 @@ sub vcl_error {
         set obj.http.Location = obj.response;
         return (deliver);
     } else {
+        # for other errors (not 5xx, not 4xx and not 2xx)
         include "conf.d/error.vcl";
     }
 
