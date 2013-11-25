@@ -47,6 +47,11 @@ sub vcl_recv {
         return (pipe);
     }
 
+    # Only cache GET or HEAD requests. This makes sure the POST requests are always passed.
+    if (req.request != "GET" && req.request != "HEAD") {
+        return (pass);
+    }
+
     # Some generic URL manipulation, useful for all templates that follow
     # First remove the Google Analytics added parameters, useless for our backend
     if (req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
