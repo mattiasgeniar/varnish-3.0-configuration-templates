@@ -23,11 +23,11 @@ backend default {
 # from the example above).
 director pool_clientip client {
   {
-    .backend = web1
+    .backend = web1;
     .weight = 1;
   }
   {
-    .backend = web2
+    .backend = web2;
     .weight = 1;
   }
 }
