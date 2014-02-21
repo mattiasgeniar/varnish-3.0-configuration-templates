@@ -52,6 +52,17 @@ sub vcl_recv {
         return (pass);
     }
 
+    # Configure grace period, in case the backend goes down. This allows otherwise "outdated"
+    # cache entries to still be served to the user, because the backend is unavailable to refresh them.
+    # This may not be desireable for you, but showing a Varnish Guru Meditation error probably isn't either.
+    set req.grace = 15s;
+    if (req.backend.healthy) {
+        set req.grace = 30s;
+    } else {
+        unset req.http.Cookie;
+        set req.grace = 6h;
+    }
+
     # Some generic URL manipulation, useful for all templates that follow
     # First remove the Google Analytics added parameters, useless for our backend
     if (req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
@@ -253,6 +264,9 @@ sub vcl_fetch {
         set beresp.ttl = 120s;
         return (hit_for_pass);
     }
+
+    # Allow stale content, in case the backend goes down.
+    set beresp.grace = 6h;
 
     return (deliver);
 }
