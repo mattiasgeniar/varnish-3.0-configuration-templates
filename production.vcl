@@ -297,7 +297,7 @@ sub vcl_error {
     if (obj.status >= 500 && obj.status <= 599 && req.restarts < 4) {
         # 4 retry for 5xx error
         return(restart);
-    } elsif (obj.status >= 400 && obj.status <= 499 ) {
+    } elseif (obj.status >= 400 && obj.status <= 499 ) {
         # use 404 error page for 4xx error
         include "conf.d/error-404.vcl";
     } elseif (obj.status == 720) {
