@@ -265,7 +265,26 @@ sub vcl_fetch {
         return (hit_for_pass);
     }
 
-    # Allow stale content, in case the backend goes down.
+    # If the backend response is an HTTP error (500, 502, 503), enter saint mode.
+    # This will block this particular request from happening again to this backend, and will restart the request on the next available backend.
+    # In case, for instance, the first backend is temporarily unavailable, this will restart the request to the second backend, without the client noticing it.
+    #
+    # Explained from the manual: by setting beresp.saintmode to a period of time, Varnish will not ask that backend again for this object for that amount of time.
+    # This only works if you have multiple baceknds.
+    if (beresp.status == 500 || beresp.status == 502 || beresp.status == 503) {
+        # Don't use this server, for this particular URL, for the next 10 seconds.
+        set beresp.saintmode = 10s;
+
+        # Restart the HTTP request, this will automatically happen on the next available server (due to saintmode, see above).
+        # But we don't want to restart POST requests, as that's dangerous (duplicate form submits etc.)
+        if (req.request != "POST") {
+            return(restart);
+        }
+    }
+
+    # Keep all objects for 6h longer in the cache than their TTL specifies.
+    # So even if HTTP objects are expired (they've passed their TTL), we can still use them in case all backends go down.
+    # Remember: old content to show is better than no content at all (or an error page).
     set beresp.grace = 6h;
 
     return (deliver);
