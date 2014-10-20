@@ -234,6 +234,21 @@ sub vcl_fetch {
         set beresp.do_esi = true;
     }
 
+    # https://www.varnish-cache.org/docs/3.0/tutorial/compression.html
+    # gzip content that can be compressed
+    if (beresp.http.content-type == "text/plain"
+          || beresp.http.content-type == "text/xml"
+          || beresp.http.content-type == "text/css"
+          || beresp.http.content-type == "application/x-javascript"
+          || beresp.http.content-type == "application/x-font-ttf"
+          || beresp.http.content-type == "application/x-font-opentype"
+          || beresp.http.content-type == "application/font-woff"
+          || beresp.http.content-type == "application/vnd.ms-fontobject"
+          || beresp.http.content-type == "image/svg+xml"
+       ) {
+        set beresp.do_gzip = true;
+    }
+
     # If the request to the backend returns a code is 5xx, restart the loop
     # If the number of restarts reaches the value of the parameter max_restarts,
     # the request will be error'ed.  max_restarts defaults to 4.  This prevents
