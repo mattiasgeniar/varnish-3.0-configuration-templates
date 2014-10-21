@@ -236,15 +236,17 @@ sub vcl_fetch {
 
     # https://www.varnish-cache.org/docs/3.0/tutorial/compression.html
     # gzip content that can be compressed
-    if (beresp.http.content-type == "text/plain"
-          || beresp.http.content-type == "text/xml"
-          || beresp.http.content-type == "text/css"
-          || beresp.http.content-type == "application/x-javascript"
-          || beresp.http.content-type == "application/x-font-ttf"
-          || beresp.http.content-type == "application/x-font-opentype"
-          || beresp.http.content-type == "application/font-woff"
-          || beresp.http.content-type == "application/vnd.ms-fontobject"
-          || beresp.http.content-type == "image/svg+xml"
+    # Do wildcard matches, since additional info (like charsets) can be added in the Content-Type header
+    if (beresp.http.content-type ~ "text/plain"
+          || beresp.http.content-type ~ "text/xml"
+          || beresp.http.content-type ~ "text/css"
+          || beresp.http.content-type ~ "text/html"
+          || beresp.http.content-type ~ "application/x-javascript"
+          || beresp.http.content-type ~ "application/x-font-ttf"
+          || beresp.http.content-type ~ "application/x-font-opentype"
+          || beresp.http.content-type ~ "application/font-woff"
+          || beresp.http.content-type ~ "application/vnd.ms-fontobject"
+          || beresp.http.content-type ~ "image/svg+xml"
        ) {
         set beresp.do_gzip = true;
     }
