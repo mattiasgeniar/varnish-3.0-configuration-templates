@@ -245,8 +245,8 @@ sub vcl_fetch {
           || beresp.http.content-type ~ "application/(x-)?font-ttf"
           || beresp.http.content-type ~ "application/(x-)?font-opentype"
           || beresp.http.content-type ~ "application/font-woff"
-          || beresp.http.content-type ~ "application/vnd.ms-fontobject"
-          || beresp.http.content-type ~ "image/svg+xml"
+          || beresp.http.content-type ~ "application/vnd\.ms-fontobject"
+          || beresp.http.content-type ~ "image/svg\+xml"
        ) {
         set beresp.do_gzip = true;
     }
