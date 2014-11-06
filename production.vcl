@@ -55,7 +55,6 @@ sub vcl_recv {
     # Configure grace period, in case the backend goes down. This allows otherwise "outdated"
     # cache entries to still be served to the user, because the backend is unavailable to refresh them.
     # This may not be desireable for you, but showing a Varnish Guru Meditation error probably isn't either.
-    set req.grace = 15s;
     if (req.backend.healthy) {
         set req.grace = 30s;
     } else {
