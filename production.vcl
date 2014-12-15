@@ -52,6 +52,11 @@ sub vcl_recv {
         return (pass);
     }
 
+    # For Websocket support, always pipe the requests: https://www.varnish-cache.org/docs/3.0/tutorial/websockets.html
+    if (req.http.Upgrade ~ "(?i)websocket") {
+        return (pipe);
+    }
+
     # Configure grace period, in case the backend goes down. This allows otherwise "outdated"
     # cache entries to still be served to the user, because the backend is unavailable to refresh them.
     # This may not be desireable for you, but showing a Varnish Guru Meditation error probably isn't either.
@@ -180,6 +185,12 @@ sub vcl_pipe {
     # applications, like IIS with NTLM authentication.
 
     #set bereq.http.Connection = "Close";
+
+    # Needed for WS (Websocket) support: https://www.varnish-cache.org/docs/3.0/tutorial/websockets.html
+    if (req.http.upgrade) {
+        set bereq.http.upgrade = req.http.upgrade;
+    }
+
     return (pipe);
 }
 
