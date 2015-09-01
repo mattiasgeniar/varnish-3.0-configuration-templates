@@ -1,3 +1,4 @@
+# First backend definition, with a built-in probe
 backend default {
     # I have Virtual Hosts that only listen to the Public IP
     # so no 127.0.0.1 for me
@@ -14,6 +15,28 @@ backend default {
     .first_byte_timeout     = 300s;   # How long to wait before we receive a first byte from our backend?
     .connect_timeout        = 5s;     # How long to wait for a backend connection?
     .between_bytes_timeout  = 2s;     # How long to wait between bytes received from our backend?
+}
+
+# Backend definition with entirely custom backend probes (raw HTTP headers) in a separated definition
+backend custom_healthchecks {
+    .host  = "127.0.0.1";
+    .port  = "80";
+    .probe = custom_backend_probe;    # Refer to the probe definition below, so we can reuse the probe.
+
+    .first_byte_timeout     = 300s;
+    .connect_timeout        = 5s;
+    .between_bytes_timeout  = 2s;
+}
+
+probe custom_backend_probe {
+  .request   = "GET /some/url HTTP/1.1"
+               "Host: some.virtualhost.domain.Tld"
+               "Connection: close"
+               "Accept-Encoding: text/html";
+  .interval  = 10s;
+  .timeout   = 10s;
+  .window    = 2;
+  .threshold = 2;
 }
 
 # Below is an example redirector based on the Client IP (same returning class C subnet IP will get
