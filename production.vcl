@@ -343,7 +343,7 @@ sub vcl_deliver {
 }
 
 sub vcl_error {
-    if (obj.status >= 500 && obj.status <= 599 && req.restarts < 4) {
+    if (obj.status >= 500 && obj.status <= 599) {
         # 4 retry for 5xx error
         return(restart);
     } elseif (obj.status >= 400 && obj.status <= 499 ) {
