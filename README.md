@@ -1,5 +1,10 @@
 ## Varnish Configuration Templates (boilerplate)
 
+### Warning: Varnish 3 is (end-of-life)[https://ma.ttias.be/varnish-cache-3-0-is-end-of-life/]
+
+You can still use Varnish 3 of course, but there will be no more security or bug fixes to the Varnish 3.x release. It's probably wise to focus your Varnish adventures on the new [varnish 4 VCL config template](https://ma.ttias.be/varnish-4-0-0-released-together-with-configuration-templates/).
+
+
 ### Installation
 
 You can use the configuration templates found in this repository to quickly get started with a complete Varnish configuration that offers support for most functionality. Start of by looking into "production.vcl" and taking the bits you need, copy it to your own default.vcl.
