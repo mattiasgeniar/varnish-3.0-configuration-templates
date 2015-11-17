@@ -32,7 +32,8 @@ probe custom_backend_probe {
   .request   = "GET /some/url HTTP/1.1"
                "Host: some.virtualhost.domain.Tld"
                "Connection: close"
-               "Accept-Encoding: text/html";
+               "Accept-Encoding: text/html"
+               "User-Agent: Varnish Health Probe";
   .interval  = 10s;
   .timeout   = 10s;
   .window    = 2;
