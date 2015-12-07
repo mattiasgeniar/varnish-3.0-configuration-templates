@@ -132,7 +132,7 @@ sub vcl_recv {
     # Normalize Accept-Encoding header
     # straight from the manual: https://www.varnish-cache.org/docs/3.0/tutorial/vary.html
     if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+        if (req.url ~ "\.(7z|bz2|docx|flac|flv|gz|jpeg|jpg|mka|mkv|mov|mp3|mp4|mpeg|mpg|ogg|ogm|opus|png|pptx|rar|svgz|tbz|tgz|txz|webm|webp|woff2|xlsx|xz|zip)$") {
             # No point in compressing these
             remove req.http.Accept-Encoding;
         } elsif (req.http.Accept-Encoding ~ "gzip") {
@@ -148,7 +148,7 @@ sub vcl_recv {
     # Large static files should be piped, so they are delivered directly to the end-user without
     # waiting for Varnish to fully read the file first.
     # TODO: once the Varnish Streaming branch merges with the master branch, use streaming here to avoid locking.
-    if (req.url ~ "^[^?]*\.(mp[34]|rar|tar|tgz|gz|wav|zip)(\?.*)?$") {
+    if (req.url ~ "^[^?]*\.(7z|avi|bz2|flac|flv|gz|mka|mkv|mov|mp3|mp4|mpeg|mpg|ogg|ogm|opus|rar|tar|tgz|tbz|txz|wav|webm|xz|zip)(\?.*)?$") {
         unset req.http.Cookie;
         return (pipe);
     }
@@ -157,7 +157,7 @@ sub vcl_recv {
     # A valid discussion could be held on this line: do you really need to cache static files that don't cause load? Only if you have memory left.
     # Sure, there's disk I/O, but chances are your OS will already have these files in their buffers (thus memory).
     # Before you blindly enable this, have a read here: https://ma.ttias.be/stop-caching-static-files/
-    if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|pdf|png|rtf|swf|txt|woff|xml)(\?.*)?$") {
+    if (req.url ~ "^[^?]*\.(7z|avi|bmp|bz2|css|csv|doc|docx|eot|flac|flv|gif|gz|ico|jpeg|jpg|js|less|mka|mkv|mov|mp3|mp4|mpeg|mpg|odt|otf|ogg|ogm|opus|pdf|png|ppt|pptx|rar|rtf|svg|svgz|swf|tar|tbz|tgz|ttf|txt|txz|wav|webm|webp|woff|woff2|xls|xlsx|xml|xz|zip)(\?.*)?$") {
         unset req.http.Cookie;
         return (lookup);
     }
@@ -275,7 +275,7 @@ sub vcl_fetch {
     # Enable cache for all static files
     # The same argument as the static caches from above: monitor your cache size, if you get data nuked out of it, consider giving up the static file cache.
     # Before you blindly enable this, have a read here: https://ma.ttias.be/stop-caching-static-files/
-    if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|mp[34]|pdf|png|rar|rtf|swf|tar|tgz|txt|wav|woff|xml|zip)(\?.*)?$") {
+    if (req.url ~ "^[^?]*\.(7z|avi|bmp|bz2|css|csv|doc|docx|eot|flac|flv|gif|gz|ico|jpeg|jpg|js|less|mka|mkv|mov|mp3|mp4|mpeg|mpg|odt|otf|ogg|ogm|opus|pdf|png|ppt|pptx|rar|rtf|svg|svgz|swf|tar|tbz|tgz|ttf|txt|txz|wav|webm|webp|woff|woff2|xls|xlsx|xml|xz|zip)(\?.*)?$") {
         unset beresp.http.set-cookie;
     }
 
