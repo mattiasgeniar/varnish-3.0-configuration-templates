@@ -22,6 +22,9 @@ sub vcl_recv {
     # Normalize the header, remove the port (in case you're testing this on various TCP ports)
     set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
 
+    # Remove the proxy header (see https://httpoxy.org/#mitigate-varnish)
+    unset req.http.proxy;
+
     # Allow purging
     if (req.request == "PURGE") {
         if (!client.ip ~ purge) {
