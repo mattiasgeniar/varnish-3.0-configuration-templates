@@ -43,4 +43,5 @@ Basic troubleshooting:
 * [Combine Apache'S HTTP authentication with Varnish IP whitelisting](https://ma.ttias.be/apache-http-authentication-with-x-forwarded-for-ip-whitelisting-in-varnish/)
 
 [Click here for a Varnish 4 VCL config template](https://github.com/mattiasgeniar/varnish-4.0-configuration-templates)
+
 [Click here for a Varnish 5 VCL config template](https://github.com/mattiasgeniar/varnish-5.0-configuration-templates)
